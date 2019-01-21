@@ -32,6 +32,7 @@ keystone_services:
         tls_backend: "{{ keystone_enable_tls_backend }}"
         port: "{{ keystone_admin_port }}"
         listen_port: "{{ keystone_admin_listen_port }}"
+        backend_http_extra: "{{ ['balance source'] if enable_keystone_federation | bool else [] }}"
   keystone-ssh:
     container_name: "keystone_ssh"
     group: "keystone"
