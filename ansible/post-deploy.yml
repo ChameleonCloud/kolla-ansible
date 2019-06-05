@@ -70,3 +70,6 @@
       vars:
         octavia_openrc_become: "{{ needs_root }}"
       when: enable_octavia | bool
+
+- name: Run additional post-deploy play
+  import_playbook: "{{ post_deploy_extra_play | default('post-deploy-noop.yml') }}"

@@ -1,0 +1,5 @@
+---
+- name: No additional post-deploy play
+  hosts: localhost
+  gather_facts: false
+  tasks: []
