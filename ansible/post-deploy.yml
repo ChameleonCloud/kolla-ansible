@@ -69,3 +69,6 @@
       vars:
         octavia_openrc_become: "{{ needs_root }}"
       when: enable_octavia | bool
+
+- import_playbook: "{{ post_deploy_extra_play }}"
+  when: post_deploy_extra_play is defined
