@@ -29,5 +29,5 @@
     - not enable_onos | bool
     - neutron_bridge_patches is defined
     - item is search(":")
-  with_together:
+  with_items:
     - "{{ neutron_bridge_patches.split(',') }}"
