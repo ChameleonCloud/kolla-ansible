@@ -254,3 +254,10 @@ keystone_database_enable_tls_internal: "{{ database_enable_tls_internal | bool }
 # Copy certificates
 ###################
 keystone_copy_certs: "{{ kolla_copy_ca_into_containers | bool or keystone_enable_tls_backend | bool }}"
+
+####################
+# WSGI
+####################
+keystone_wsgi_public_vhost_config: |
+  {{'#'}} Custom vhost configuration can be added here via
+  {{'#'}} the `keystone_wsgi_public_vhost_config` variable.
