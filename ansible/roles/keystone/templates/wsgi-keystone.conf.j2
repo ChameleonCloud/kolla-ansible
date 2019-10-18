@@ -115,5 +115,6 @@ LogLevel info
 {% endif %}
 {% endfor %}
 {% endif %}
+    {{ keystone_wsgi_public_vhost_config | indent(4) }}
 </VirtualHost>
 
