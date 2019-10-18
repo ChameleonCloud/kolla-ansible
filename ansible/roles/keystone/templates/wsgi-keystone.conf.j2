@@ -106,6 +106,7 @@ LogLevel info
 {% endif %}
 {% endfor %}
 {% endif %}
+    {{ keystone_wsgi_public_vhost_config | indent(4) }}
 </VirtualHost>
 
 <VirtualHost *:{{ keystone_admin_listen_port }}>
@@ -126,4 +127,5 @@ LogLevel info
     SSLCertificateFile /etc/keystone/certs/keystone-cert.pem
     SSLCertificateKeyFile /etc/keystone/certs/keystone-key.pem
 {% endif %}
+    {{ keystone_wsgi_admin_vhost_config | indent(4) }}
 </VirtualHost>
