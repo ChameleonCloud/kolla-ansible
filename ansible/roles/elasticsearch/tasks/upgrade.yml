@@ -1,13 +1,13 @@
 ---
 # The official procedure for upgrade elasticsearch:
-# https://www.elastic.co/guide/en/elasticsearch/reference/5.6/restart-upgrade.html
+# https://www.elastic.co/guide/en/elasticsearch/reference/6.x/restart-upgrade.html
 - name: Disable shard allocation
   uri:
     url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/_cluster/settings"
     method: PUT
     status_code: 200
     return_content: yes
-    body: {"transient":{"cluster.routing.allocation.enable": "none"}}
+    body: {"transient":{"cluster.routing.allocation.enable": "primaries"}}
     body_format: json
   delegate_to: "{{ groups['elasticsearch'][0] }}"
   run_once: true
@@ -46,3 +46,6 @@
 
 - name: Flush handlers
   meta: flush_handlers
+
+- include_tasks: migrate-kibana-index.yml
+  when: enable_kibana | bool
