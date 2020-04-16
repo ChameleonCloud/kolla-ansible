@@ -52,6 +52,7 @@ keepalived_dimensions: "{{ default_container_dimensions }}"
 haproxy_default_volumes:
   - "{{ node_config_directory }}/haproxy/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
+  - "letsencrypt_certs:/etc/letsencrypt:ro"
   - "haproxy_socket:/var/lib/kolla/haproxy/"
 keepalived_default_volumes:
   - "{{ node_config_directory }}/keepalived/:{{ container_config_directory }}/:ro"
