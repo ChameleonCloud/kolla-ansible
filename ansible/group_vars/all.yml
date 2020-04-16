@@ -357,6 +357,7 @@ grafana_server_port: "3000"
 
 haproxy_stats_port: "1984"
 haproxy_monitor_port: "61313"
+haproxy_ssh_port: "2985"
 
 heat_internal_fqdn: "{{ kolla_internal_fqdn }}"
 heat_external_fqdn: "{{ kolla_external_fqdn }}"
@@ -394,6 +395,8 @@ keystone_admin_listen_port: "{{ keystone_admin_port }}"
 keystone_ssh_port: "8023"
 
 kuryr_port: "23750"
+
+letsencrypt_webserver_port: "8081"
 
 magnum_api_port: "9511"
 
@@ -730,6 +733,7 @@ enable_ironic_neutron_agent: "{{ enable_neutron | bool and enable_ironic | bool 
 enable_ironic_pxe_uefi: "no"
 enable_iscsid: "{{ enable_cinder | bool and enable_cinder_backend_iscsi | bool }}"
 enable_kuryr: "no"
+enable_letsencrypt: "no"
 enable_magnum: "no"
 enable_manila: "no"
 enable_manila_backend_generic: "no"
@@ -889,7 +893,8 @@ kolla_tls_backend_key: "{{ kolla_certificates_dir }}/backend-key.pem"
 #####################
 # ACME client options
 #####################
-acme_client_servers: []
+acme_client_lego: "server lego {{ api_interface_address }}:{{ letsencrypt_webserver_port }}"
+acme_client_servers: "{% set arr = [] %}{% if enable_letsencrypt | bool %}{{ arr.append(acme_client_lego) }}{% endif %}{{ arr }}"
 
 ####################
 # Keystone options

@@ -210,6 +210,9 @@ control
 [venus:children]
 monitoring
 
+[letsencrypt:children]
+loadbalancer
+
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
 #
@@ -750,6 +753,12 @@ venus
 
 [venus-manager:children]
 venus
+
+[letsencrypt-webserver:children]
+letsencrypt
+
+[letsencrypt-lego:children]
+letsencrypt
 
 [doni:children]
 control
