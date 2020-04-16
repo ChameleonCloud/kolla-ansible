@@ -760,3 +760,12 @@ venus
 
 [venus-manager:children]
 venus
+
+[letsencrypt:children]
+haproxy
+
+[letsencrypt-acme:children]
+letsencrypt
+
+[letsencrypt-certbot:children]
+letsencrypt
