@@ -44,7 +44,7 @@
   run_once: True
   when:
     - item.name not in existing_mappings
-  with_items: "{{ keystone_keystone_identity_mappings }}"
+  with_items: "{{ keystone_identity_mappings }}"
   delegate_to: localhost
 
 - name: Update existing attribute mappings in OpenStack
@@ -60,7 +60,7 @@
   run_once: True
   when:
     - item.name in existing_mappings
-  with_items: "{{ keystone_keystone_identity_mappings }}"
+  with_items: "{{ keystone_identity_mappings }}"
   delegate_to: localhost
 
 - name: List configured IdPs
