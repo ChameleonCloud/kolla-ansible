@@ -34,16 +34,16 @@
             "dest": "/etc/{{ keystone_dir }}/wsgi-keystone.conf",
             "owner": "keystone",
             "perm": "0600"
-        }{% if should_use_oidc %},
+        }{% if enable_keystone_federation_openid %},
         {
             "source": "{{ container_config_directory }}/metadata",
-            "dest": "{{ container_keystone_federation_oidc_metadata_folder }}",
+            "dest": "{{ keystone_federation_oidc_metadata }}",
             "merge": true,
             "preserve_properties": true
         },
         {
             "source": "{{ container_config_directory }}/cert",
-            "dest": "{{ container_keystone_federation_oidc_idp_certificate_folder }}",
+            "dest": "{{ keystone_federation_oidc_certificate }}",
             "merge": true,
             "preserve_properties": true
         }
@@ -57,15 +57,15 @@
         {
             "path": "/var/log/kolla/keystone/keystone.log",
             "owner": "keystone:keystone"
-        },{% if should_use_oidc %}
+        },{% if enable_keystone_federation_openid %}
         {
-            "path": "/etc/apache2/metadata",
+            "path": "{{ keystone_federation_oidc_metadata }}",
             "owner": "www-data:www-data",
             "perm": "0700",
             "recurse": true
         },
         {
-            "path": "/etc/apache2/cert",
+            "path": "{{ keystone_federation_oidc_certificate }}",
             "owner": "www-data:www-data",
             "perm": "0700",
             "recurse": true

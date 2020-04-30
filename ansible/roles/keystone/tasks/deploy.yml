@@ -19,4 +19,8 @@
 - include_tasks: check.yml
 
 - include_tasks: register_identity_providers.yml
-  when: identity_providers is defined
+  when:
+    - keystone_identity_providers is defined
+    - keystone_identity_providers is not none
+    - identity_provider_attribute_mappings is defined
+    - identity_provider_attribute_mappings is not none

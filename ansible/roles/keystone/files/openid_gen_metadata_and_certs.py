@@ -25,21 +25,15 @@ else:
 
 
 def main(argv):
-    certificate_transformer = None
-    key_transformer = certificate_transformer
+    posargs = iter(argv)
 
-    metadata_folder = "{{ host_keystone_federation_oidc_metadata_folder }}"
-    cert_folder = "{{ host_keystone_federation_oidc_idp_certificate_folder }}"
-
-    idp_url = argv[0]
-    client_id = argv[1]
-    client_secret = argv[2]
-    certificate = argv[3]
-    key_id = argv[4]
-    if len(argv) > 5:
-        certificate_transformer = argv[5]
-        if len(argv) > 6:
-            key_transformer = argv[6]
+    idp_url = next(posargs)
+    client_id = next(posargs)
+    client_secret = next(posargs)
+    certificate = next(posargs, None)
+    key_id = next(posargs, None)
+    certificate_transformer = next(posargs, None)
+    key_transformer = next(posargs, None)
 
     file_name = quote_plus(re.sub("https?://", "", idp_url))
     json_provider_url = idp_url + '/.well-known/openid-configuration'
@@ -51,20 +45,40 @@ def main(argv):
     json_conf = {}
     json_client = json.dumps({'client_id': client_id, 'client_secret': client_secret})
 
-    key_id = get_value_by_url(key_id)
-    certificate = get_value_by_url(certificate)
+    if key_id and certificate:
+        key_id = get_value_by_url(key_id)
+        if key_transformer:
+            key_id = eval(key_transformer)
+        certificate = get_value_by_url(certificate)
+        if certificate_transformer:
+            certificate = eval(certificate_transformer)
+    elif not (key_id or certificate):
+        jwks_uri = json_provider.get("jwks_uri")
+        if jwks_uri:
+            key_id, certificate = fetch_jkws_key(jwks_uri)
+    else
+        raise ValueError(
+            "Either both a key_id and a certificate must be specified, or else "
+            "neither, in which case the values are automatically inferred from "
+            "the IdP well-known metadata URL.")
 
-    if key_transformer:
-        key_id = eval(key_transformer)
-    if certificate_transformer:
-        certificate = eval(certificate_transformer)
+    create_file("metadata", file_name, "provider", json_provider)
+    create_file("metadata", file_name, "client", json_client)
+    create_file("metadata", file_name, "conf", json_conf)
 
-    create_file(metadata_folder, file_name, "provider", json_provider)
-    create_file(metadata_folder, file_name, "client", json_client)
-    create_file(metadata_folder, file_name, "conf", json_conf)
-    create_file(cert_folder, key_id, "pem", certificate)
+    if key_id and certificate:
+        create_file("cert", key_id, "pem", certificate)
+        print(key_id)
 
-    print(key_id)
+
+def fetch_jkws_key(jwks_uri):
+    certs = json.dumps(requests.get(jwks_uri))
+    keys = certs.get("keys")
+
+    if not keys:
+        return None, None
+
+    return keys[0]["kid"], keys[0]["x5c"][0]
 
 
 def create_file(file_path, file_name, extension, content):
