@@ -225,7 +225,7 @@ OPENSTACK_KEYSTONE_DEFAULT_ROLE = "{{ keystone_default_user_role }}"
 # and federation protocol combination (WEBSSO_IDP_MAPPING).
 {% if enable_keystone_federation | bool %}
 WEBSSO_ENABLED = True
-WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}"
+WEBSSO_KEYSTONE_URL = "{{ keystone_public_url }}/v3"
 WEBSSO_CHOICES = (
     ("credentials", _("Keystone Credentials")),
     {% for idp in keystone_identity_providers %}
