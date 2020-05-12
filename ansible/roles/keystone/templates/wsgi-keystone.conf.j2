@@ -67,7 +67,7 @@ LogLevel info
     </LocationMatch>
 
     <LocationMatch /OS-FEDERATION/identity_providers/.*?/protocols/openid/auth>
-      AuthType auth-openidc
+      AuthType openid-connect
       Require valid-user
       LogLevel debug
     </LocationMatch>
