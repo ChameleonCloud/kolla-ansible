@@ -49,17 +49,16 @@ LogLevel info
     OIDCOAuthVerifyCertFiles {{ certificate_key_ids | join(" ") }}
 {% endif %}
     OIDCCryptoPassphrase {{ keystone_federation_openid_crypto_password }}
-{% if keystone_identity_providers | length == 1 %}
-    OIDCRedirectURI {{ keystone_public_url }}/v3/auth/OS-FEDERATION/identity_providers/{{ keystone_identity_providers[0].name }}/protocols/openid/auth
-{% else %}
     OIDCRedirectURI {{ keystone_public_url }}/redirect_uri
+{% if keystone_federation_openid_discovery_url is not none %}
+    OIDCDiscoverURL {{ keystone_federation_openid_discovery_url }}
+{% endif %}
 
     <Location ~ "/redirect_uri">
       Require valid-user
       AuthType openid-connect
       LogLevel debug
     </Location>
-{% endif %}
 
     <LocationMatch /v3/auth/OS-FEDERATION/identity_providers/.*?/protocols/openid/websso>
       Require valid-user
