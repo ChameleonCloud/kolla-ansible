@@ -20,6 +20,7 @@
   loop: "{{ keystone_fernet_token_list }}"
   loop_control:
     index_var: index
+  no_log: true
 
 - name: Waiting for Keystone SSH port to be UP
   wait_for:
