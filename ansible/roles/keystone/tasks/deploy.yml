@@ -19,4 +19,5 @@
 - include_tasks: check.yml
 
 - include_tasks: register_identity_providers.yml
-  when: identity_providers is defined
+  when:
+    - enable_keystone_federation | bool
