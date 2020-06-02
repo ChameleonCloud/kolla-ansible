@@ -48,6 +48,37 @@
     mode: "0660"
   when: service | service_enabled_and_mapped_to_host
 
+- name: Check if custom openrc.sh.template exists
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  delegate_to: localhost
+  register: check_openrc_template
+  with_first_found:
+    - files:
+        - "openrc.sh.template"
+      paths:
+        - "{{ node_custom_config }}/horizon/{{ inventory_hostname }}/"
+        - "{{ node_custom_config }}/horizon/"
+      skip: true
+
+- name: Set custom openrc fact
+  ansible.builtin.set_fact:
+    custom_openrc: "{{ check_openrc_template.results | length > 0 }}"
+
+- name: Copying over openrc.sh.template
+  become: true
+  vars:
+    service: "{{ horizon_services['horizon'] }}"
+  ansible.builtin.template:
+    src: "{{ check_openrc_template.results.0.stat.path }}"
+    dest: "{{ node_config_directory }}/horizon/openrc.sh.template"
+    mode: "0660"
+  when:
+    - service | service_enabled_and_mapped_to_host
+    - custom_openrc | bool
+  notify:
+    - Restart horizon container
+
 - name: "Configure uWSGI for Horizon"
   ansible.builtin.include_role:
     name: service-uwsgi-config
