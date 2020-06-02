@@ -29,6 +29,11 @@ WEBROOT = '/'
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['*']
 
+# Template directories defined here will be added to DIRS option of Django
+# TEMPLATES setting. It is useful when you would like to load
+# deployment-specific templates.`
+ADD_TEMPLATE_DIRS = ['/etc/openstack-dashboard/templates']
+
 {% if horizon_backend_database | bool %}
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DATABASES = {
@@ -208,6 +213,11 @@ OPENSTACK_HOST = "{{ kolla_internal_fqdn }}"
 
 # TODO(fprzewozn): URL /v3 suffix is required until Horizon bug #2073639 is resolved
 OPENSTACK_KEYSTONE_URL = "{{ horizon_keystone_url }}/v3"
+
+{% if custom_openrc %}
+OPENRC_CUSTOM_TEMPLATE = "openrc.sh.template"
+{% endif %}
+
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "{{ keystone_default_user_role }}"
 
 {% if enable_keystone_federation | bool %}
