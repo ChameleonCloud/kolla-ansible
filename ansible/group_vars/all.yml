@@ -506,6 +506,8 @@ prometheus_elasticsearch_exporter_port: "9108"
 # Prometheus blackbox-exporter ports
 prometheus_blackbox_exporter_port: "9115"
 
+prometheus_snmp_exporter_port: "9116"
+
 proxysql_admin_port: "6032"
 
 rabbitmq_port: "{{ '5671' if rabbitmq_enable_tls | bool else '5672' }}"
