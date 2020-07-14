@@ -693,6 +693,9 @@ compute
 network
 storage
 
+[prometheus-pushgateway:children]
+monitoring
+
 [prometheus-mysqld-exporter:children]
 mariadb
 
