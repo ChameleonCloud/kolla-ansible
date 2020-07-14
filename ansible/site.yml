@@ -467,6 +467,7 @@
   gather_facts: false
   hosts:
     - prometheus
+    - prometheus-pushgateway
     - prometheus-mysqld-exporter
     - prometheus-memcached-exporter
     - prometheus-alertmanager
