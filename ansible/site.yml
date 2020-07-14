@@ -432,7 +432,8 @@
     - prometheus-elasticsearch-exporter
     - prometheus-blackbox-exporter
     - prometheus-libvirt-exporter
-    - '&enable_prometheus_True'
+    - prometheus-snmp-exporter
+    - "&enable_prometheus_True"
   serial: '{{ kolla_serial|default("0") }}'
   roles:
     - { role: prometheus, tags: prometheus, when: enable_prometheus | bool }
