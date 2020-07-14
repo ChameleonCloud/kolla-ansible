@@ -143,6 +143,13 @@ prometheus_services:
     image: "{{ prometheus_libvirt_exporter_image_full }}"
     volumes: "{{ prometheus_libvirt_exporter_default_volumes + prometheus_libvirt_exporter_extra_volumes }}"
     dimensions: "{{ prometheus_libvirt_exporter_dimensions }}"
+  prometheus-snmp-exporter:
+    container_name: "prometheus_snmp_exporter"
+    group: "prometheus-snmp-exporter"
+    enabled: "{{ enable_prometheus_snmp_exporter | bool }}"
+    image: "{{ prometheus_snmp_exporter_image_full }}"
+    volumes: "{{ prometheus_snmp_exporter_default_volumes + prometheus_snmp_exporter_extra_volumes }}"
+    dimensions: "{{ prometheus_snmp_exporter_dimensions }}"
 
 ####################
 # Prometheus Server
@@ -357,6 +364,17 @@ prometheus_blackbox_exporter_endpoints_custom: []
 
 
 ####################
+# SNMP
+####################
+
+# prometheus_snmp_exporter_modules:
+#   - name: dell_force10
+#     endpoints:
+#       - '10.0.0.1'
+#       - '10.0.0.2'
+prometheus_snmp_exporter_modules: []
+
+####################
 # Docker
 ####################
 prometheus_tag: "{{ openstack_tag }}"
@@ -406,6 +424,13 @@ prometheus_libvirt_exporter_image: "{{ docker_registry ~ '/' if docker_registry 
 prometheus_libvirt_exporter_tag: "{{ prometheus_tag }}"
 prometheus_libvirt_exporter_image_full: "{{ prometheus_libvirt_exporter_image }}:{{ prometheus_libvirt_exporter_tag }}"
 
+prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ docker_image_name_prefix }}prometheus-snmp-exporter"
+prometheus_snmp_exporter_tag: "{{ prometheus_tag }}"
+prometheus_snmp_exporter_image_full: "{{ prometheus_snmp_exporter_image }}:{{ prometheus_snmp_exporter_tag }}"
+prometheus_snmp_exporter_generator_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ docker_image_name_prefix }}prometheus-snmp-exporter-generator"
+prometheus_snmp_exporter_generator_tag: "{{ prometheus_tag }}"
+prometheus_snmp_exporter_generator_image_full: "{{ prometheus_snmp_exporter_generator_image }}:{{ prometheus_snmp_exporter_generator_tag }}"
+
 prometheus_server_dimensions: "{{ default_container_dimensions }}"
 prometheus_pushgateway_dimensions: "{{ default_container_dimensions }}"
 prometheus_mysqld_exporter_dimensions: "{{ default_container_dimensions }}"
@@ -417,6 +442,7 @@ prometheus_openstack_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_elasticsearch_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_blackbox_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_libvirt_exporter_dimensions: "{{ default_container_dimensions }}"
+prometheus_snmp_exporter_dimensions: "{{ default_container_dimensions }}"
 
 prometheus_server_default_volumes:
   - "{{ node_config_directory }}/prometheus-server/:{{ container_config_directory }}/:ro"
@@ -481,6 +507,11 @@ prometheus_libvirt_exporter_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "/run/libvirt:/run/libvirt:ro"
+prometheus_snmp_exporter_default_volumes:
+  - "{{ node_config_directory }}/prometheus-snmp-exporter/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
 
 prometheus_extra_volumes: "{{ default_extra_volumes }}"
 prometheus_server_extra_volumes: "{{ prometheus_extra_volumes }}"
@@ -494,6 +525,7 @@ prometheus_openstack_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_elasticsearch_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_blackbox_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_libvirt_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_snmp_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 
 prometheus_openstack_exporter_disabled_volume: "{{ '--disable-service.volume' if not enable_cinder | bool else '' }}"
 prometheus_openstack_exporter_disabled_dns: "{{ '--disable-service.dns' if not enable_designate | bool else '' }}"
