@@ -705,6 +705,9 @@ compute
 [prometheus-msteams:children]
 prometheus-alertmanager
 
+[prometheus-snmp-exporter:children]
+monitoring
+
 [masakari-api:children]
 control
 
