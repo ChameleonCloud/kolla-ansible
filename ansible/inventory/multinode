@@ -727,6 +727,9 @@ monitoring
 [prometheus-libvirt-exporter:children]
 compute
 
+[prometheus-snmp-exporter:children]
+monitoring
+
 [masakari-api:children]
 control
 
