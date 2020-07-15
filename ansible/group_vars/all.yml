@@ -493,6 +493,7 @@ prometheus_cadvisor_port: "18080"
 prometheus_fluentd_integration_port: "24231"
 prometheus_libvirt_exporter_port: "9177"
 prometheus_etcd_integration_port: "{{ etcd_client_port }}"
+prometheus_jupyterhub_exporter_port: "8075"
 
 # Prometheus alertmanager ports
 prometheus_alertmanager_port: "9093"
@@ -1162,6 +1163,7 @@ enable_prometheus_rabbitmq_exporter: "{{ enable_prometheus | bool and enable_rab
 enable_prometheus_libvirt_exporter: "{{ enable_prometheus | bool and enable_nova | bool and nova_compute_virt_type in ['kvm', 'qemu'] }}"
 enable_prometheus_etcd_integration: "{{ enable_prometheus | bool and enable_etcd | bool }}"
 enable_prometheus_msteams: "no"
+enable_prometheus_jupyterhub_exporter: "{{ enable_jupyterhub | bool and enable_prometheus | bool }}"
 
 prometheus_alertmanager_user: "admin"
 prometheus_scrape_interval: "60s"
