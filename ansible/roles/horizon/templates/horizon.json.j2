@@ -30,6 +30,13 @@
             "owner": "horizon",
             "perm": "0600"
         },
+        {
+            "source": "{{ container_config_directory }}/clouds.yaml.template",
+            "dest": "/etc/openstack-dashboard/templates/clouds.yaml.template",
+            "owner": "horizon",
+            "perm": "0600",
+            "optional": true
+        },
         {"source": "{{ container_config_directory }}/openrc.sh.template",
             "dest": "/etc/openstack-dashboard/templates/openrc.sh.template",
             "owner": "horizon",
