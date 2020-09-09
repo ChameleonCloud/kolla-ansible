@@ -63,6 +63,9 @@ OPENSTACK_HOST = "{{ kolla_internal_fqdn }}"
 {% if custom_openrc %}
 OPENRC_CUSTOM_TEMPLATE = "openrc.sh.template"
 {% endif %}
+{% if custom_clouds_yaml %}
+OPENSTACK_CLOUDS_YAML_CUSTOM_TEMPLATE = "clouds.yaml.template"
+{% endif %}
 
 # TODO(fprzewozn): URL /v3 suffix is required until Horizon bug #2073639 is resolved
 OPENSTACK_KEYSTONE_URL = "{{ horizon_keystone_url }}/v3"
