@@ -79,6 +79,37 @@
   notify:
     - Restart horizon container
 
+- name: Check if custom clouds.yaml.template exists
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  delegate_to: localhost
+  register: check_clouds_yaml_template
+  with_first_found:
+    - files:
+        - "clouds.yaml.template"
+      paths:
+        - "{{ node_custom_config }}/horizon/{{ inventory_hostname }}/"
+        - "{{ node_custom_config }}/horizon/"
+      skip: true
+
+- name: Set custom clouds YAML fact
+  ansible.builtin.set_fact:
+    custom_clouds_yaml: "{{ check_clouds_yaml_template.results | length > 0 }}"
+
+- name: Copying over clouds.yaml.template
+  become: true
+  vars:
+    service: "{{ horizon_services['horizon'] }}"
+  ansible.builtin.template:
+    src: "{{ check_clouds_yaml_template.results.0.stat.path }}"
+    dest: "{{ node_config_directory }}/horizon/clouds.yaml.template"
+    mode: "0660"
+  when:
+    - service | service_enabled_and_mapped_to_host
+    - custom_clouds_yaml | bool
+  notify:
+    - Restart horizon container
+
 - name: "Configure uWSGI for Horizon"
   ansible.builtin.include_role:
     name: service-uwsgi-config
