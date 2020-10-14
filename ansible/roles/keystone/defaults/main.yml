@@ -215,6 +215,7 @@ keystone_should_remove_attribute_mappings: False
 keystone_should_remove_identity_providers: False
 keystone_federation_oidc_response_type: "id_token"
 keystone_federation_oidc_scopes: "openid email profile"
+keystone_federation_oidc_allowed_redirects: []
 
 ####################
 # WSGI
