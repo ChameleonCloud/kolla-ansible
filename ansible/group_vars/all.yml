@@ -1175,3 +1175,4 @@ telegraf_enable_docker_input: "no"
 #     file: "/full/qualified/path/to/mapping/json/file/to/mappingId3"
 keystone_identity_providers: []
 keystone_identity_mappings: []
+keystone_federation_oidc_allowed_redirects: []
