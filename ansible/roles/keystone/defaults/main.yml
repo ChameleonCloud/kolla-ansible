@@ -243,6 +243,7 @@ keystone_federation_oidc_response_type: "id_token"
 keystone_federation_oidc_forwarded_headers: ""
 keystone_federation_oidc_claim_delimiter: ";"
 keystone_federation_oidc_scopes: "openid email profile"
+keystone_federation_oidc_allowed_redirects: []
 
 # OIDC caching
 keystone_oidc_enable_memcached: "{{ enable_memcached }}"
