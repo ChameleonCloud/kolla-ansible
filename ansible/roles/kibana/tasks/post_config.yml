@@ -5,9 +5,14 @@
     port: "{{ kibana_server_port }}"
   run_once: true
 
+- name: Set facts for URLs
+  set_fact:
+    elasticsearch_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}"
+    kibana_url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ kibana_server_port }}"
+
 - name: Register the kibana index in elasticsearch
   uri:
-    url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/.kibana"
+    url: "{{ elasticsearch_url }}/.kibana"
     method: PUT
     body: "{{ kibana_default_index_options | to_json }}"
     body_format: json
@@ -16,13 +21,16 @@
   failed_when:
     # If the index already exists, Elasticsearch will respond with a 400 error.
     - result.status == 400
+    # If the index was previously created after 6.x, the exception will be index_already_exists_exception
     # Format: {"json": {"error": {"type": "index_already_exists_exception"}}}
-    - result.get('json', {}).get('error', {}).get('type') != 'index_already_exists_exception'
+    # If the index was created prior to 6.x, the 6.x migration changes it to be an alias, and invalid_index_name_exception will be raised instead.
+    # Format: {"json": {"error": {"type": "invalid_index_name_exception"}}}
+    - result.get('json', {}).get('error', {}).get('type') not in ['index_already_exists_exception', 'invalid_index_name_exception']
   run_once: true
 
 - name: Wait for kibana to register in elasticsearch
   uri:
-    url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/.kibana"
+    url: "{{ elasticsearch_url }}/.kibana"
     status_code: 200
   register: result
   until: result.status == 200
@@ -30,43 +38,53 @@
   delay: 2
   run_once: true
 
-- name: Change kibana config to set index as defaultIndex
+- name: Get Kibana config
   uri:
-    url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/.kibana/config/*"
+    url: "{{ kibana_url }}/api/saved_objects/_find?type=config"
+    user: "{{ kibana_user }}"
+    password: "{{ kibana_password }}"
+    return_content: yes
+  register: kibana_config
+  run_once: true
+  failed_when: kibana_config.status != 200 or kibana_config.json.saved_objects | length < 1
+
+- name: Change Kibana config to set index as defaultIndex
+  uri:
+    url: "{{ kibana_url }}/api/saved_objects/config/{{ kibana_config.json.saved_objects[0].id }}"
     method: PUT
+    user: "{{ kibana_user }}"
+    password: "{{ kibana_password }}"
+    # Kibana REST API requires xsrf token to be set, but it's not enforced.
+    # https://discuss.elastic.co/t/where-can-i-get-the-correct-kbn-xsrf-value-for-my-plugin-http-requests/158725/3
+    headers:
+      kbn-xsrf: kibana
     body:
-      defaultIndex: "{{ kibana_default_index_pattern }}"
+      attributes:
+        defaultIndex: "{{ kibana_default_index_pattern }}"
     body_format: json
-    status_code: 200, 201
   run_once: true
 
-- name: Get kibana default indexes
+- name: Get existing index pattern
   uri:
-    headers:
-      Content-Type: application/json
-    url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/.kibana"
+    url: "{{ kibana_url }}/api/saved_objects/index-pattern/{{ kibana_default_index_pattern }}"
     method: GET
-  register: kibana_default_indexes
+    user: "{{ kibana_user }}"
+    password: "{{ kibana_password }}"
+    status_code: 200, 404
+  register: kibana_default_index_existing
   run_once: true
   when: kibana_default_index is defined
 
-- name: Set kibana default indexes fact
-  set_fact:
-    kibana_default_indexes: "{{ kibana_default_indexes.json | default([]) }}"
-  when:
-    - kibana_default_indexes is defined
-  run_once: true
-  connection: local
-
 - name: Add index pattern to kibana
   uri:
-    url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}/.kibana/index-pattern/{{ kibana_default_index_pattern }}"
-    method: PUT
-    body: "{{ kibana_default_index | to_json }}"
+    url: "{{ kibana_url }}/api/saved_objects/index-pattern/{{ kibana_default_index_pattern }}"
+    method: POST
+    user: "{{ kibana_user }}"
+    password: "{{ kibana_password }}"
+    body:
+      attributes: "{{ kibana_default_index }}"
     body_format: json
-    status_code: 200, 201
   run_once: true
   when:
     - kibana_default_index is defined
-    - kibana_default_indexes is defined
-    - kibana_default_indexes['.kibana']['mappings']['config']['properties']['defaultIndex'] is defined
+    - kibana_default_index_existing.status == 404
