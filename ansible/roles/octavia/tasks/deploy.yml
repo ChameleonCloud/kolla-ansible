@@ -1,15 +1,17 @@
 ---
-- include_tasks: "register.yml"
-  when: inventory_hostname in groups['octavia-api']
+- import_tasks: register.yml
 
-- include_tasks: "config.yml"
-  when: inventory_hostname in groups['octavia-api'] or
-        inventory_hostname in groups['octavia-health-manager'] or
-        inventory_hostname in groups['octavia-housekeeping'] or
-        inventory_hostname in groups['octavia-worker']
+- include_tasks: prepare.yml
+  when: octavia_auto_configure | bool
 
-- include_tasks: "bootstrap.yml"
-  when: inventory_hostname in groups['octavia-api']
+- import_tasks: config.yml
+
+- import_tasks: check-containers.yml
+
+- include_tasks: clone.yml
+  when: octavia_dev_mode | bool
+
+- import_tasks: bootstrap.yml
 
 - name: Flush handlers
   meta: flush_handlers
