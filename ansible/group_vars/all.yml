@@ -802,6 +802,7 @@ kolla_external_fqdn_cert: "{{ node_config }}/certificates/haproxy.pem"
 kolla_internal_fqdn_cert: "{{ node_config }}/certificates/haproxy-internal.pem"
 kolla_external_fqdn_cacert: "{{ node_config }}/certificates/haproxy-ca.crt"
 kolla_internal_fqdn_cacert: "{{ node_config }}/certificates/haproxy-ca-internal.crt"
+kolla_copy_ca_into_containers: "no"
 
 ####################
 # LetsEncrypt options
@@ -1219,3 +1220,10 @@ keystone_identity_mappings: []
 
 # The identity API version to be used to register IdPs in OpenStack
 identity_api_version: 3
+
+##########
+# Octavia
+##########
+octavia_admin_endpoint: "{{ admin_protocol }}://{{ octavia_internal_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
+octavia_internal_endpoint: "{{ internal_protocol }}://{{ octavia_internal_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
+octavia_public_endpoint: "{{ public_protocol }}://{{ octavia_external_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
