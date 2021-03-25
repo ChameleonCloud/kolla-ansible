@@ -1,0 +1,7 @@
+---
+enable_doni: false
+
+doni_internal_fqdn: "{{ kolla_internal_fqdn }}"
+doni_external_fqdn: "{{ kolla_external_fqdn }}"
+doni_api_port: "8100"
+doni_api_listen_port: "{{ doni_api_port }}"

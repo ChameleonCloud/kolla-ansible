@@ -373,6 +373,7 @@ workaround_ansible_issue_8743: true
 #enable_cyborg: false
 #enable_designate: false
 #enable_destroy_images: false
+#enable_doni: false
 #enable_etcd: false
 #enable_fluentd: true
 #enable_fluentd_systemd: "{{ (enable_fluentd | bool) and (enable_central_logging | bool) }}"
