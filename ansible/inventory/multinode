@@ -766,3 +766,12 @@ venus
 
 [venus-manager:children]
 venus
+
+[doni:children]
+control
+
+[doni-api:children]
+doni
+
+[doni-worker:children]
+doni

@@ -329,6 +329,7 @@ workaround_ansible_issue_8743: yes
 #enable_cyborg: "no"
 #enable_designate: "no"
 #enable_destroy_images: "no"
+#enable_doni: "no"
 #enable_etcd: "no"
 #enable_fluentd: "yes"
 #enable_freezer: "no"
