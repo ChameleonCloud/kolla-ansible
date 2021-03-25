@@ -739,3 +739,12 @@ ovn-database
 
 [ovn-sb-db:children]
 ovn-database
+
+[doni:children]
+control
+
+[doni-api:children]
+doni
+
+[doni-worker:children]
+doni
