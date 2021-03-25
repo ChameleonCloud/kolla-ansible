@@ -160,6 +160,8 @@ fluentd_input_openstack_services:
     enabled: "{{ enable_cyborg | bool }}"
   - name: designate
     enabled: "{{ enable_designate | bool }}"
+  - name: doni
+    enabled: "{{ enable_doni | bool }}"
   - name: glance
     enabled: "{{ enable_glance | bool }}"
   - name: gnocchi
