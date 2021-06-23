@@ -51,6 +51,8 @@
       name: "{{ blazar_aggregate_pool_name }}"
   run_once: true
   delegate_to: "{{ groups['blazar-api'][0] }}"
+  when:
+    - enable_nova | bool
 
 - name: Run blazar bootstrap container
   ansible.builtin.import_tasks: bootstrap_service.yml
