@@ -25,7 +25,7 @@
 - name: Find custom prometheus alert rules files
   ansible.builtin.find:
     path: "{{ node_custom_config }}/prometheus/"
-    pattern: "*.rules"
+    pattern: "*.rules.yml"
   run_once: true
   delegate_to: localhost
   register: prometheus_alert_rules
