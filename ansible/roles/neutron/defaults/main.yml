@@ -238,6 +238,14 @@ neutron_services:
     volumes: "{{ neutron_ovn_vpn_agent_default_volumes + neutron_ovn_vpn_agent_extra_volumes }}"
     dimensions: "{{ neutron_ovn_vpn_agent_dimensions }}"
     healthcheck: "{{ neutron_ovn_vpn_agent_healthcheck }}"
+  neutron-wireguard-agent:
+    container_name: "neutron_wireguard_agent"
+    image: "{{ neutron_wireguard_agent_image_full }}"
+    enabled: "{{ enable_neutron_wireguard | bool }}"
+    privileged: True
+    host_in_groups: "{{ inventory_hostname in groups['neutron-l3-agent'] }}"
+    volumes: "{{ neutron_wireguard_agent_default_volumes + neutron_wireguard_agent_extra_volumes }}"
+    dimensions: "{{ neutron_wireguard_agent_dimensions }}"
 
 ####################
 # Config Validate
@@ -366,6 +374,10 @@ neutron_ovn_vpn_agent_image: "{{ docker_image_url }}neutron-ovn-vpn-agent"
 neutron_ovn_vpn_agent_tag: "{{ neutron_tag }}"
 neutron_ovn_vpn_agent_image_full: "{{ neutron_ovn_vpn_agent_image }}:{{ neutron_ovn_vpn_agent_tag }}"
 
+neutron_wireguard_agent_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ neutron_install_type }}-neutron-wireguard-agent"
+neutron_wireguard_agent_tag: "{{ neutron_tag }}"
+neutron_wireguard_agent_image_full: "{{ neutron_wireguard_agent_image }}:{{ neutron_wireguard_agent_tag }}"
+
 neutron_agent_dimensions: "{{ default_container_dimensions }}"
 
 neutron_dhcp_agent_dimensions: "{{ neutron_agent_dimensions }}"
@@ -386,6 +398,7 @@ neutron_ovn_maintenance_worker_dimensions: "{{ default_container_dimensions }}"
 neutron_periodic_worker_dimensions: "{{ default_container_dimensions }}"
 neutron_rpc_server_dimensions: "{{ default_container_dimensions }}"
 neutron_ovn_vpn_agent_dimensions: "{{ neutron_agent_dimensions }}"
+neutron_wireguard_agent_dimensions: "{{ default_container_dimensions }}"
 
 neutron_dhcp_agent_enable_healthchecks: "{{ enable_container_healthchecks }}"
 neutron_dhcp_agent_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
@@ -699,6 +712,15 @@ neutron_ovn_vpn_agent_default_volumes:
   - "kolla_logs:/var/log/kolla/"
   - "{{ '/dev/shm:/dev/shm' }}"
   - "/bin/true:/usr/sbin/sysctl:ro"
+neutron_wireguard_agent_default_volumes:
+  - "{{ node_config_directory }}/neutron-wireguard-agent/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ '/dev/shm:/dev/shm' }}"
+  - "/run/netns:/run/netns:shared"
+  - neutron_wireguard:/etc/neutron/plugins/wireguard
+  - "{{ kolla_dev_repos_directory ~ '/neutron:/dev-mode/neutron' if neutron_dev_mode | bool else '' }}"
 
 neutron_extra_volumes: "{{ default_extra_volumes }}"
 neutron_dhcp_agent_extra_volumes: "{{ neutron_extra_volumes }}"
@@ -719,6 +741,7 @@ neutron_ovn_maintenance_worker_extra_volumes: "{{ neutron_extra_volumes }}"
 neutron_periodic_worker_extra_volumes: "{{ neutron_extra_volumes }}"
 neutron_rpc_server_extra_volumes: "{{ neutron_extra_volumes }}"
 neutron_ovn_vpn_agent_extra_volumes: "{{ neutron_extra_volumes }}"
+neutron_wireguard_agent_extra_volumes: "{{ neutron_extra_volumes }}"
 
 ####################
 # OpenStack

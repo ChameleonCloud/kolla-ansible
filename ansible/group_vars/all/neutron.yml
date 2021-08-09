@@ -18,6 +18,7 @@ enable_neutron_trunk: false
 enable_neutron_metering: false
 enable_neutron_infoblox_ipam_agent: false
 enable_neutron_port_forwarding: false
+enable_neutron_wireguard: false
 neutron_enable_ovn_agent: false
 
 neutron_keystone_user: "neutron"

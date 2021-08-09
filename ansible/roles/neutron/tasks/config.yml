@@ -82,6 +82,7 @@
       - "neutron-rpc-server"
       - "neutron-server"
       - "neutron-sriov-agent"
+      - "neutron-wireguard-agent"
   merge_configs:
     sources:
       - "{{ role_path }}/templates/neutron.conf.j2"
@@ -137,6 +138,7 @@
       - "neutron-periodic-worker"
       - "neutron-rpc-server"
       - "neutron-server"
+      - "neutron-wireguard-agent"
   merge_configs:
     sources:
       - "{{ role_path }}/templates/ml2_conf.ini.j2"
