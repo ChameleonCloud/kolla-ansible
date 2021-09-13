@@ -78,7 +78,7 @@
 
 - name: Configure the metadata files for OpenID IdPs
   vars:
-      keystone: "{{ keystone_services.keystone }}"
+    keystone: "{{ keystone_services.keystone }}"
   script: >
     openid_gen_metadata_and_certs.py \
     --output-dir={{ node_config_directory }}/keystone \
@@ -89,6 +89,7 @@
     --jwt-certificate-transformer="{{ item.certificate_transformer|default("") }}" \
     --jwt-key-path="{{ item.key_id|default("") }}" \
     --jwt-key-transformer="{{ item.key_transformer|default("") }}"
+  become: true
   register: certificate_key_ids
   when:
     - enable_keystone_federation_openid | bool
