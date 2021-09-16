@@ -225,6 +225,7 @@
       - { name: "trove", enabled: "{{ enable_trove | bool }}" }
       - { name: "valkey", enabled: "{{ enable_valkey | bool }}" }
       - { name: "venus", enabled: "{{ enable_venus | bool }}" }
+      - { name: "tunelo", enabled: "{{ enable_tunelo | bool }}" }
       - { name: "watcher", enabled: "{{ enable_watcher | bool }}" }
       - { name: "zun", enabled: "{{ enable_zun | bool }}" }
   template:
