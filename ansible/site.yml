@@ -72,6 +72,7 @@
         - enable_telegraf_{{ enable_telegraf | bool }}
         - enable_trove_{{ enable_trove | bool }}
         - enable_venus_{{ enable_venus | bool }}
+        - enable_tunelo_{{ enable_tunelo | bool }}
         - enable_vitrage_{{ enable_vitrage | bool }}
         - enable_watcher_{{ enable_watcher | bool }}
         - enable_zun_{{ enable_zun | bool }}
@@ -327,6 +328,11 @@
             tasks_from: loadbalancer
           tags: venus
           when: enable_venus | bool
+        - include_role:
+            name: tunelo
+            tasks_from: loadbalancer
+          tags: tunelo
+          when: enable_tunelo | bool
         - include_role:
             name: vitrage
             tasks_from: loadbalancer
@@ -984,3 +990,12 @@
   serial: '{{ kolla_serial|default("0") }}'
   roles:
     - { role: doni, tags: doni, when: enable_doni | bool }
+
+- name: Apply role tunelo
+  gather_facts: false
+  hosts:
+    - tunelo-api
+    - "&enable_tunelo_True"
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: tunelo, tags: tunelo, when: enable_tunelo | bool }

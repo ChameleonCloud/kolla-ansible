@@ -570,6 +570,11 @@ trove_api_listen_port: "{{ trove_api_port }}"
 
 venus_api_port: "10010"
 
+tunelo_internal_fqdn: "{{ kolla_internal_fqdn }}"
+tunelo_external_fqdn: "{{ kolla_external_fqdn }}"
+tunelo_api_port: "8101"
+tunelo_api_listen_port: "{{ tunelo_api_port }}"
+
 watcher_api_port: "9322"
 
 zun_api_port: "9517"
@@ -773,6 +778,7 @@ enable_telegraf: "no"
 enable_trove: "no"
 enable_trove_singletenant: "no"
 enable_venus: "no"
+enable_tunelo: "no"
 enable_vitrage: "no"
 enable_watcher: "no"
 enable_zun: "no"
