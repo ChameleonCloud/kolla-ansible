@@ -766,3 +766,9 @@ doni
 
 [doni-worker:children]
 doni
+
+[tunelo:chilren]
+control
+
+[tunelo-api:children]
+tunelo
