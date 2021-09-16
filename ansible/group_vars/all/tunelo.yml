@@ -1,0 +1,7 @@
+---
+enable_tunelo: false
+
+tunelo_internal_fqdn: "{{ kolla_internal_fqdn }}"
+tunelo_external_fqdn: "{{ kolla_external_fqdn }}"
+tunelo_api_port: "8101"
+tunelo_api_listen_port: "{{ tunelo_api_port }}"

@@ -76,6 +76,7 @@
       - { name: "skyline", enabled: "{{ enable_skyline | bool }}" }
       - { name: "tacker", enabled: "{{ enable_tacker | bool }}" }
       - { name: "trove", enabled: "{{ enable_trove | bool }}" }
+      - { name: "tunelo", enabled: "{{ enable_tunelo | bool }}" }
       - { name: "watcher", enabled: "{{ enable_watcher | bool }}" }
       - { name: "zun", enabled: "{{ enable_zun | bool }}" }
   ansible.builtin.template:
