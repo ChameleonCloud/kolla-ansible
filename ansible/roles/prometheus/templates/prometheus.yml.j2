@@ -81,7 +81,6 @@ scrape_configs:
 {% if enable_prometheus_fluentd_integration | bool %}
   - job_name: fluentd
     static_configs:
-      - targets:
 {% for host in groups['fluentd'] %}
       - targets:
           - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_fluentd_integration_port'] }}'
