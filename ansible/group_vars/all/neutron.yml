@@ -4,6 +4,7 @@ enable_neutron: "{{ enable_openstack_core | bool }}"
 enable_neutron_vpnaas: false
 enable_neutron_sriov: false
 enable_neutron_mlnx: false
+enable_neutron_genericswitch: false
 enable_neutron_dvr: false
 enable_neutron_fwaas: false
 enable_neutron_qos: false
