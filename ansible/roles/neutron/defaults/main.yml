@@ -691,6 +691,8 @@ neutron_subprojects:
 # Mechanism drivers
 ####################
 mechanism_drivers:
+  - name: "wireguard"
+    enabled: "{{ enable_neutron_wireguard | bool }}"
   - name: "openvswitch"
     enabled: "{{ neutron_plugin_agent == 'openvswitch' }}"
   - name: "mlnx_infiniband"
