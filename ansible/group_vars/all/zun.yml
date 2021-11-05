@@ -1,5 +1,6 @@
 ---
 enable_zun: false
+enable_zun_compute: "{{ enable_zun | bool }}"
 
 # Extra docker options for Zun
 docker_configure_for_zun: false
