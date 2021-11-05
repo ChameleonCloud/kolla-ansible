@@ -785,6 +785,7 @@ enable_tunelo: "no"
 enable_vitrage: "no"
 enable_watcher: "no"
 enable_zun: "no"
+enable_zun_compute: "{{ enable_zun | bool }}"
 
 ovs_datapath: "{{ 'netdev' if enable_ovs_dpdk | bool else 'system' }}"
 designate_keystone_user: "designate"
