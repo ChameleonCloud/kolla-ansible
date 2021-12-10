@@ -86,3 +86,22 @@
   # good enough (better than including config change triggers)
   listen:
     - zun-cni-daemon container changed
+
+- name: Restart zun-compute-k8s container
+  vars:
+    service_name: "zun-compute-k8s"
+    service: "{{ zun_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ zun_docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    privileged: "{{ service.privileged | default(False) }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+    healthcheck: "{{ service.healthcheck | default(omit) }}"
+  listen:
+    - zun-compute-k8s container changed
+  when:
+    - kolla_action != "config"
