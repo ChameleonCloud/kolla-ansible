@@ -46,6 +46,13 @@ zun_services:
     privileged: True
     volumes: "{{ zun_compute_default_volumes + zun_compute_extra_volumes }}"
     dimensions: "{{ zun_compute_dimensions }}"
+  zun-compute-k8s:
+    container_name: zun_compute_k8s
+    group: zun-compute-k8s
+    enabled: "{{ enable_zun_compute_k8s }}"
+    image: "{{ zun_compute_k8s_image_full }}"
+    volumes: "{{ zun_compute_k8s_default_volumes + zun_compute_k8s_extra_volumes }}"
+    dimensions: "{{ zun_compute_k8s_dimensions }}"
 
 ####################
 ## Database
@@ -53,7 +60,6 @@ zun_services:
 zun_database_name: "zun"
 zun_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}zun{% endif %}"
 zun_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
-
 
 ####################
 ## Docker
@@ -74,9 +80,14 @@ zun_compute_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ doc
 zun_compute_tag: "{{ zun_tag }}"
 zun_compute_image_full: "{{ zun_compute_image }}:{{ zun_compute_tag }}"
 
+zun_compute_k8s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ zun_install_type }}-zun-compute-k8s"
+zun_compute_k8s_tag: "{{ zun_tag }}"
+zun_compute_k8s_image_full: "{{ zun_compute_k8s_image }}:{{ zun_compute_k8s_tag }}"
+
 zun_api_dimensions: "{{ default_container_dimensions }}"
 zun_wsproxy_dimensions: "{{ default_container_dimensions }}"
 zun_compute_dimensions: "{{ default_container_dimensions }}"
+zun_compute_k8s_dimensions: "{{ default_container_dimensions }}"
 
 zun_api_default_volumes:
   - "{{ node_config_directory }}/zun-api/:{{ container_config_directory }}/:ro"
@@ -103,11 +114,18 @@ zun_compute_default_volumes:
   - "/dev:/dev"
   - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
   - "/var/lib/zun:/var/lib/zun"
+zun_compute_k8s_default_volumes:
+  - "{{ node_config_directory }}/zun-compute-k8s/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
 
 zun_extra_volumes: "{{ default_extra_volumes }}"
 zun_api_extra_volumes: "{{ zun_extra_volumes }}"
 zun_wsproxy_extra_volumes: "{{ zun_extra_volumes }}"
 zun_compute_extra_volumes: "{{ zun_extra_volumes }}"
+zun_compute_k8s_extra_volumes: "{{ zun_extra_volumes }}"
 
 ####################
 ## OpenStack
@@ -121,7 +139,6 @@ zun_logging_debug: "{{ openstack_logging_debug }}"
 zun_keystone_user: "zun"
 
 openstack_zun_auth: "{{ openstack_auth }}"
-
 
 ####################
 # Kolla
@@ -139,9 +156,9 @@ zun_ks_services:
     type: "container"
     description: "Container Service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ zun_admin_endpoint }}'}
-      - {'interface': 'internal', 'url': '{{ zun_internal_endpoint }}'}
-      - {'interface': 'public', 'url': '{{ zun_public_endpoint }}'}
+      - { "interface": "admin", "url": "{{ zun_admin_endpoint }}" }
+      - { "interface": "internal", "url": "{{ zun_internal_endpoint }}" }
+      - { "interface": "public", "url": "{{ zun_public_endpoint }}" }
 
 zun_ks_users:
   - project: "service"
