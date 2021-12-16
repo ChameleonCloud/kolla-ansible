@@ -252,9 +252,7 @@ prometheus_libvirt_exporter_image_full: "{{ prometheus_libvirt_exporter_image }}
 prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-snmp-exporter"
 prometheus_snmp_exporter_tag: "{{ prometheus_tag }}"
 prometheus_snmp_exporter_image_full: "{{ prometheus_snmp_exporter_image }}:{{ prometheus_snmp_exporter_tag }}"
-prometheus_snmp_exporter_generator_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-snmp-exporter-generator"
-prometheus_snmp_exporter_generator_tag: "{{ prometheus_tag }}"
-prometheus_snmp_exporter_generator_image_full: "{{ prometheus_snmp_exporter_generator_image }}:{{ prometheus_snmp_exporter_generator_tag }}"
+prometheus_snmp_exporter_generator_image_full: prom/snmp-generator:master
 
 prometheus_ipmi_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-ipmi-exporter"
 prometheus_ipmi_exporter_tag: "{{ prometheus_tag }}"
