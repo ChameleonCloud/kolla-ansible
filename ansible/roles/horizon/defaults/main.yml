@@ -126,6 +126,7 @@ horizon_healthcheck:
 horizon_default_volumes:
   - "{{ node_config_directory }}/horizon/:{{ container_config_directory }}/:ro"
   - "{{ kolla_dev_repos_directory ~ '/horizon:/dev-mode/horizon' if horizon_dev_mode | bool else '' }}"
+  - "{{ kolla_dev_repos_directory ~ '/blazar-dashboard:/dev-mode/blazar_dashboard' if horizon_blazar_dev_mode | bool else '' }}"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
@@ -150,10 +151,14 @@ horizon_wsgi_threads: 1
 # Kolla
 ####################
 horizon_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+blazar_dashboard_git_repository: "{{ kolla_dev_repos_git }}/blazar-dashboard"
 
 horizon_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 horizon_dev_mode: "{{ kolla_dev_mode }}"
 horizon_source_version: "{{ kolla_source_version }}"
+
+horizon_blazar_dev_mode: "{{ horizon_dev_mode }}"
+horizon_blazar_source_version: "{{ kolla_source_version }}"
 
 # This variable was created for administrators to define which one of the Keystone's URLs should be configured in Horizon.
 # In some cases, such as when using OIDC, horizon will need to be configured with Keystone's public URL.
