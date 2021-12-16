@@ -179,6 +179,7 @@ prometheus_snmp_exporter_modules: []
 ####################
 
 prometheus_ipmi_exporter_endpoints: []
+prometheus_ipmi_exporter_modules: []
 
 ####################
 # Docker
