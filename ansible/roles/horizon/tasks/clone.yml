@@ -6,3 +6,13 @@
     dest: "{{ kolla_dev_repos_directory }}/{{ project_name }}"
     update: "{{ horizon_dev_repos_pull }}"
     version: "{{ horizon_source_version }}"
+
+- name: Cloning blazar-dashboard source repositories for development
+  become: true
+  git:
+    repo: "{{ blazar_dashboard_git_repository }}"
+    dest: "{{ kolla_dev_repos_directory }}/blazar-dashboard"
+    update: "{{ horizon_dev_repos_pull }}"
+    version: "{{ horizon_blazar_source_version }}"
+  when:
+    - horizon_blazar_dev_mode | bool
