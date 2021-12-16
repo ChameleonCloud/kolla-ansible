@@ -282,9 +282,7 @@ prometheus_msteams_image_full: "{{ prometheus_msteams_image }}:{{ prometheus_mst
 prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-snmp-exporter"
 prometheus_snmp_exporter_tag: "{{ prometheus_tag }}"
 prometheus_snmp_exporter_image_full: "{{ prometheus_snmp_exporter_image }}:{{ prometheus_snmp_exporter_tag }}"
-prometheus_snmp_exporter_generator_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-snmp-exporter-generator"
-prometheus_snmp_exporter_generator_tag: "{{ prometheus_tag }}"
-prometheus_snmp_exporter_generator_image_full: "{{ prometheus_snmp_exporter_generator_image }}:{{ prometheus_snmp_exporter_generator_tag }}"
+prometheus_snmp_exporter_generator_image_full: prom/snmp-generator:master
 
 prometheus_server_dimensions: "{{ default_container_dimensions }}"
 prometheus_pushgateway_dimensions: "{{ default_container_dimensions }}"
