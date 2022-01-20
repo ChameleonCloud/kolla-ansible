@@ -15,6 +15,9 @@ node_custom_config: "{{ node_config }}/config"
 # The directory to store the config files on the destination node
 node_config_directory: "/etc/kolla"
 
+# The directory where the admin OpenRC file is written to during post-deploy
+admin_openrc_directory: "{{ node_config }}"
+
 # The group which own node_config_directory, you can use a non-root
 # user to deploy kolla
 config_owner_user: "root"
