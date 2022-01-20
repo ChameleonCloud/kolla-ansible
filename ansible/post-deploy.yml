@@ -31,7 +31,7 @@
       become: "{{ needs_root }}"
       template:
         src: "roles/common/templates/admin-openrc.sh.j2"
-        dest: "{{ node_config }}/admin-openrc.sh"
+        dest: "{{ admin_openrc_directory }}/admin-openrc.sh"
         owner: "{{ ansible_facts.user_uid }}"
         group: "{{ ansible_facts.user_gid }}"
         mode: 0600
