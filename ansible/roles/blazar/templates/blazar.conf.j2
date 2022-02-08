@@ -20,7 +20,7 @@ identity_service = identity
 api_v2_controllers = oshosts,leases
 
 [manager]
-plugins = virtual.instance.plugin,physical.host.plugin
+plugins = {% for plugin in blazar_enabled_plugins %}{{ plugin.name }}.plugin,{% endfor %}
 
 [keystone_authtoken]
 www_authenticate_uri = {{ keystone_internal_url }}/v3
@@ -51,6 +51,16 @@ blazar_username = {{ blazar_keystone_user }}
 blazar_password = {{ blazar_keystone_password }}
 blazar_project_name = service
 
+{% if blazar_enabled_device_plugins | count > 0 %}
+[device]
+plugins = {% for plugin in blazar_enabled_device_plugins %}{{ plugin.name }}.plugin,{% endfor %}
+{% endif %}
+
+{% if blazar_enable_device_plugin_k8s | bool %}
+[k8s]
+kubeconfig_file = /etc/blazar/kubeconfig.yml
+{% endif %}
+
 [oslo_messaging_notifications]
 {% if blazar_enabled_notification_topics %}
 driver = messagingv2
@@ -58,7 +68,6 @@ topics = {{ blazar_enabled_notification_topics | map(attribute='name') | join(',
 {% else %}
 driver = noop
 {% endif %}
-
 
 {% if blazar_policy_file is defined %}
 [oslo_policy]

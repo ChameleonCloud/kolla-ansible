@@ -28,11 +28,33 @@ blazar_services:
     volumes: "{{ blazar_manager_default_volumes + blazar_manager_extra_volumes }}"
     dimensions: "{{ blazar_manager_dimensions }}"
 
-
 ####################
 # Blazar
 ####################
 blazar_aggregate_pool_name: "freepool"
+
+blazar_plugins:
+  - name: "physical.host"
+    enabled: True
+  - name: "virtual.instance"
+    enabled: True
+  - name: "virtual.floatingip"
+    enabled: True
+  - name: "network"
+    enabled: "{{ blazar_enable_plugin_network | bool }}"
+  - name: "device"
+    enabled: "{{ blazar_enabled_device_plugins | count > 0 }}"
+blazar_device_plugins:
+  - name: "zun"
+    enabled: "{{ enable_zun | bool }}"
+  - name: "k3s"
+    enabled: "{{ blazar_enable_device_plugin_k8s | bool }}"
+
+blazar_enable_plugin_network: "no"
+blazar_enable_device_plugin_k8s: "no"
+
+blazar_enabled_plugins: "{{ blazar_plugins|selectattr('enabled', 'equalto', true)|list }}"
+blazar_enabled_device_plugins: "{{ blazar_device_plugins|selectattr('enabled', 'equalto', true)|list }}"
 
 ####################
 # Database
@@ -40,7 +62,6 @@ blazar_aggregate_pool_name: "freepool"
 blazar_database_name: "blazar"
 blazar_database_user: "blazar"
 blazar_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
-
 
 ####################
 # Docker
@@ -89,7 +110,6 @@ blazar_keystone_user: "blazar"
 
 openstack_blazar_auth: "{{ openstack_auth }}"
 
-
 #####################
 ## Kolla
 #####################
@@ -97,7 +117,6 @@ blazar_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
 blazar_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 blazar_dev_mode: "{{ kolla_dev_mode }}"
 blazar_source_version: "{{ kolla_source_version }}"
-
 
 ####################
 # Notifications
@@ -116,9 +135,9 @@ blazar_ks_services:
     type: "reservation"
     description: "OpenStack Reservation Service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ blazar_admin_endpoint }}'}
-      - {'interface': 'internal', 'url': '{{ blazar_internal_endpoint }}'}
-      - {'interface': 'public', 'url': '{{ blazar_public_endpoint }}'}
+      - { "interface": "admin", "url": "{{ blazar_admin_endpoint }}" }
+      - { "interface": "internal", "url": "{{ blazar_internal_endpoint }}" }
+      - { "interface": "public", "url": "{{ blazar_public_endpoint }}" }
 
 blazar_ks_users:
   - project: "service"
