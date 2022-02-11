@@ -112,6 +112,7 @@
   when:
     - zun_policy_file is defined
     - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
   with_dict: "{{ zun_services }}"
   notify:
     - Restart {{ item.key }} container
