@@ -62,22 +62,31 @@
   notify:
     - Restart {{ item.key }} container
 
-- name: Copying over kubeconfig for k8s agent
-  vars:
-    service_name: zun-compute-k8s
-  copy:
-    src: "{{ item }}"
-    dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
-    mode: "0600"
+- name: Check for kubeconfig
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: zun_kubeconfig
   with_first_found:
     - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
     - "{{ node_custom_config }}/zun/kubeconfig.yml"
     - "{{ node_custom_config }}/kubeconfig.yml"
     - "kubeconfig.yml.j2"
+
+- name: Copying over kubeconfig for k8s driver
+  vars:
+    service_name: "{{ item }}"
+  copy:
+    src: "{{ zun_kubeconfig.results.0.stat.path }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
+    mode: "0600"
+  with_items:
+    - zun-compute-k8s
+    - zun-wsproxy
   become: true
   when:
     - zun_services[service_name].enabled | bool
     - inventory_hostname in groups[zun_services[service_name].group]
+    - zun_kubeconfig.results
 
 - name: Copying over wsgi-zun files for services
   vars:

@@ -6,6 +6,13 @@
             "dest": "/etc/zun/zun.conf",
             "owner": "zun",
             "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/kubeconfig.yml",
+            "dest": "/etc/zun/kubeconfig.yml",
+            "owner": "zun",
+            "perm": "0600",
+            "optional": true
         }{% if zun_policy_file is defined %},
         {
             "source": "{{ container_config_directory }}/{{ zun_policy_file }}",
