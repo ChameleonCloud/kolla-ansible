@@ -47,7 +47,7 @@ blazar_plugins:
 blazar_device_plugins:
   - name: "zun"
     enabled: "{{ enable_zun | bool }}"
-  - name: "k3s"
+  - name: "k8s"
     enabled: "{{ blazar_enable_device_plugin_k8s | bool }}"
 
 blazar_enable_plugin_network: "no"
