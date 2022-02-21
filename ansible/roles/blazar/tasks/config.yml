@@ -81,10 +81,12 @@
   run_once: True
   register: blazar_kubeconfig
   with_first_found:
-    - "{{ node_custom_config }}/blazar/{{ inventory_hostname }}/kubeconfig.yml"
-    - "{{ node_custom_config }}/blazar/kubeconfig.yml"
-    - "{{ node_custom_config }}/kubeconfig.yml"
-    - "kubeconfig.yml.j2"
+    - files:
+        - "{{ node_custom_config }}/blazar/{{ inventory_hostname }}/kubeconfig.yml"
+        - "{{ node_custom_config }}/blazar/kubeconfig.yml"
+        - "{{ node_custom_config }}/kubeconfig.yml"
+        - "kubeconfig.yml.j2"
+      skip: true
 
 - name: Copying over kubeconfig for k8s device plugin
   vars:
