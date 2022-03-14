@@ -397,3 +397,37 @@
     - "{{ check_extra_ml2_plugins.files }}"
   notify:
     - "Restart {{ item.0 }} container"
+
+- name: Ensuring ssh config directory exists
+  become: true
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  file:
+    path: "{{ node_config_directory }}/neutron-server/ssh"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  when:
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+
+- name: Copying over ssh key
+  become: true
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+    key_filename: "{{ item.ngs_config.key_file | basename }}"
+  copy:
+    content: "{{ item.auth.private_key }}"
+    dest: "{{ node_config_directory }}/neutron-server/ssh/{{ key_filename }}"
+    mode: "0600"
+  when:
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - switch_configs is defined | bool
+    - "item.ngs_config is defined | bool"
+    - "item.auth.private_key is defined | bool"
+    - "item.ngs_config.key_file is defined | bool"
+  loop: "{{ switch_configs }}"
