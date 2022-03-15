@@ -100,7 +100,7 @@
     service_name: "neutron-server"
     neutron_server: "{{ neutron_services[service_name] }}"
   file:
-    path: "{{ node_config_directory }}/neutron-server/ssh"
+    path: "{{ node_config_directory }}/{{ service_name }}/ssh"
     state: "directory"
     owner: "{{ config_owner_user }}"
     group: "{{ config_owner_group }}"
@@ -122,9 +122,9 @@
   when:
     - neutron_server.enabled | bool
     - neutron_server.host_in_groups | bool
-    - switch_configs is defined | bool
-    - "item.ngs_config is defined | bool"
-    - "item.auth.private_key is defined | bool"
+    - switch_configs is defined
+    - item.ngs_config is defined
+    - item.auth.private_key is defined
   loop: "{{ switch_configs }}"
 
 - name: Copying over ml2_conf.ini

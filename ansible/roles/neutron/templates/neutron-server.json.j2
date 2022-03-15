@@ -29,7 +29,8 @@
             "source": "{{ container_config_directory }}/ssh/",
             "dest": "/etc/neutron/ssh",
             "owner": "neutron",
-            "perm": "0700"
+            "perm": "0700",
+            "optional": true
         },
 {% if check_extra_ml2_plugins is defined and check_extra_ml2_plugins.matched > 0 %}{% for plugin in check_extra_ml2_plugins.files %}
         {
