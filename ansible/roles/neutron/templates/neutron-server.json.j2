@@ -13,6 +13,13 @@
             "owner": "neutron",
             "perm": "0600"
         },
+        {
+            "source": "{{ container_config_directory }}/ssh/",
+            "dest": "/etc/neutron/ssh",
+            "owner": "neutron",
+            "perm": "0700",
+            "optional": true
+        },
         {% if neutron_policy_file is defined %}{
             "source": "{{ container_config_directory }}/{{ neutron_policy_file }}",
             "dest": "/etc/neutron/{{ neutron_policy_file }}",
@@ -45,6 +52,12 @@
         {
             "path": "/var/log/kolla/neutron",
             "owner": "neutron:neutron",
+            "recurse": true
+        },
+        {
+            "path": "/etc/neutron/ssh",
+            "owner": "neutron",
+            "perm": "0600",
             "recurse": true
         }
     ]
