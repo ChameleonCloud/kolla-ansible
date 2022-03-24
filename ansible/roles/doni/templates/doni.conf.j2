@@ -32,7 +32,7 @@ api_workers = {{ openstack_service_workers }}
 [worker]
 ; TODO
 
-{% if enable_k3s | bool %}
+{% if enable_k3s | d(False) | bool %}
 [k8s]
 kubeconfig_file = /etc/doni/kubeconfig.yml
 {% endif %}
