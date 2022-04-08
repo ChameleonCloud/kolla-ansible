@@ -325,6 +325,9 @@ network
 [manila-data:children]
 manila
 
+[manila-nfs-ganesha:children]
+manila
+
 # Barbican
 [barbican-api:children]
 barbican
