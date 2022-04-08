@@ -63,3 +63,13 @@ ssl_ca_file = {{ om_rabbitmq_cacert }}
 [oslo_policy]
 policy_file = {{ blazar_policy_file }}
 {% endif %}
+
+{% if blazar_enabled_network_plugins | count > 0 %}
+[network]
+usage_type_plugins = {% for plugin in blazar_enabled_network_plugins %}{{ plugin.name }}.plugin,{% endfor %}
+{% endif %}
+
+{% if blazar_enable_network_plugin_storage %}
+[network_storage]
+ceph_nfs_share_type = {{ default_share_type }}
+{% endif %}
