@@ -42,6 +42,13 @@ blazar_services:
     dimensions: "{{ blazar_manager_dimensions }}"
     healthcheck: "{{ blazar_manager_healthcheck }}"
 
+blazar_network_plugins:
+  - name: "storage"
+    enabled: "{{ blazar_enable_network_plugin_storage | bool }}"
+
+blazar_enable_network_plugin_storage: false
+blazar_network_storage_share_type: "default_share_type"
+blazar_enabled_network_plugins: "{{ blazar_network_plugins|selectattr('enabled', 'equalto', true)|list }}"
 
 ####################
 # Blazar
