@@ -1,0 +1,19 @@
+NFS_CORE_PARAM
+{
+	Enable_NLM = false;
+	Enable_RQUOTA = false;
+	Protocols = 4;
+}
+
+NFSv4
+{
+	Minor_Versions =  1,2;
+}
+
+LOG {
+        Facility {
+                name = FILE;
+                destination = "/var/log/kolla/manila/manila-nfs-ganesha.log";
+                enable = active;
+        }
+}
