@@ -31,7 +31,7 @@
             "dest": "/etc/haproxy/haproxy.pem",
             "owner": "root",
             "perm": "0700",
-            "optional": {{ (not kolla_enable_tls_external | bool) | string | lower }}
+            "optional": {{ ((not kolla_enable_tls_external | bool) or (enable_letsencrypt | d(false) | bool)) | string | lower }}
         },
         {
             "source": "{{ container_config_directory }}/haproxy-internal.pem",

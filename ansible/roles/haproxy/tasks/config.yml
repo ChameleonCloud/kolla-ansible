@@ -120,6 +120,7 @@
     - kolla_enable_tls_external | bool
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - not enable_letsencrypt | d(false) | bool
   notify:
     - Restart haproxy container
 
