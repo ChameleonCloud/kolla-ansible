@@ -237,7 +237,7 @@
   command: >
     docker run --rm \
       --mount type=bind,src={{ node_config_directory }}/prometheus-snmp-exporter,dst=/etc/prometheus \
-      {{ prometheus_snmp_exporter_generator_image }} \
+      {{ prometheus_snmp_exporter_generator_image_full }} \
       generate
   when:
     - service | service_enabled_and_mapped_to_host
