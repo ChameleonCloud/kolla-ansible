@@ -192,7 +192,7 @@
   command: >
     docker run --rm \
       --mount type=bind,src={{ node_config_directory }}/prometheus-snmp-exporter,dst=/etc/prometheus \
-      {{ prometheus_snmp_exporter_generator_image }} \
+      {{ prometheus_snmp_exporter_generator_image_full }} \
       generate
   when:
     - inventory_hostname in groups[service.group]
@@ -200,7 +200,7 @@
     - prometheus_snmp_exporter_generator_config.changed
   notify:
     - Restart prometheus-snmp-exporter container
-    
+
 - name: Copying config file for IPMI exporter
   become: true
   vars:
