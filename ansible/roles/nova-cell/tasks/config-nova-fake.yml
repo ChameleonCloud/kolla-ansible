@@ -34,6 +34,19 @@
     mode: "0660"
   with_sequence: start=1 end={{ num_nova_fake_per_node }}
 
+# Ideally these services would not require access to policy files, but there
+# is a place in compute where they are referenced:
+# https://opendev.org/openstack/nova/src/commit/627c461a62ce722a4c95a44b181f40b8db198c2b/nova/network/neutronv2/api.py#L532
+- name: Copying over existing policy file
+  become: true
+  template:
+    src: "{{ nova_policy_file_path }}"
+    dest: "{{ node_config_directory }}/nova-compute-fake-{{ item }}/{{ nova_policy_file }}"
+    mode: "0660"
+  when:
+    - nova_policy_file is defined
+  with_sequence: start=1 end={{ num_nova_fake_per_node }}
+
 - name: Ensuring config directory has correct owner and permission
   become: true
   file:
