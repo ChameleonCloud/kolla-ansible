@@ -28,7 +28,7 @@
 
 - name: Ensuring certs config subdir exists
   vars:
-    service: "{{ haproxy_services['haproxy'] }}"
+    service: "{{ loadbalancer_services['haproxy'] }}"
   file:
     path: "{{ node_config_directory }}/haproxy/certs.d"
     state: "directory"
@@ -142,7 +142,7 @@
 
 - name: Copying over custom haproxy certs
   vars:
-    service: "{{ haproxy_services['haproxy'] }}"
+    service: "{{ loadbalancer_services['haproxy'] }}"
   template:
     src: "{{ item }}"
     dest: "{{ node_config_directory }}/haproxy/certs.d/"
