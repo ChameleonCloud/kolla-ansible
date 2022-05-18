@@ -749,7 +749,7 @@ venus
 venus
 
 [letsencrypt:children]
-haproxy
+loadbalancer
 
 [letsencrypt-acme:children]
 letsencrypt
