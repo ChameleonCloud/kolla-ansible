@@ -747,7 +747,7 @@ ovn-database
 ovn-database
 
 [letsencrypt:children]
-haproxy
+loadbalancer
 
 [letsencrypt-acme:children]
 letsencrypt
