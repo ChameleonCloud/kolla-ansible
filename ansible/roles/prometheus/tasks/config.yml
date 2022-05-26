@@ -98,7 +98,6 @@
     - Restart prometheus-server container
 
 - name: Find custom alertmanager template files
-  become: true
   local_action:
     module: find
     path: "{{ node_custom_config }}/prometheus/"
