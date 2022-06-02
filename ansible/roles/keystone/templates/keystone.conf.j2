@@ -83,7 +83,7 @@ allowed_origin = {{ grafana_public_endpoint }}
 {% for dashboard in keystone_trusted_dashboards %}
 trusted_dashboard = {{ dashboard }}
 {% endfor %}
-{% if enable_keystone_federation_openid | bool %}
+{% if keystone_enable_federation_openid | bool %}
 assertion_payload = OIDC_id_token_payload
 {% endif %}
 sso_callback_template = /etc/keystone/sso_callback_template.html
