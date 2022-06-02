@@ -38,8 +38,7 @@ horizon_services:
         external: false
         port: "{% if kolla_enable_tls_internal | bool %}{{ horizon_tls_port }}{% else %}{{ horizon_port }}{% endif %}"
         listen_port: "{{ horizon_listen_port }}"
-        frontend_http_extra:
-          - "use_backend acme_client_back if { path_reg ^/.well-known/acme-challenge/.+ }"
+        frontend_http_extra: "{{ acme_frontend_http_extra + horizon_frontend_http_extra }}"
         backend_http_extra:
           - "balance {{ 'roundrobin' if enable_memcached | bool or horizon_backend_database | bool else 'source' }}"
         tls_backend: "{{ horizon_enable_tls_backend }}"
@@ -55,8 +54,7 @@ horizon_services:
         external: true
         port: "{% if kolla_enable_tls_external | bool %}{{ horizon_tls_port }}{% else %}{{ horizon_port }}{% endif %}"
         listen_port: "{{ horizon_listen_port }}"
-        frontend_http_extra:
-          - "use_backend acme_client_back if { path_reg ^/.well-known/acme-challenge/.+ }"
+        frontend_http_extra: "{{ acme_frontend_http_extra + horizon_external_frontend_http_extra }}"
         backend_http_extra:
           - "balance {{ 'roundrobin' if enable_memcached | bool or horizon_backend_database | bool else 'source' }}"
         tls_backend: "{{ horizon_enable_tls_backend }}"
@@ -145,6 +143,13 @@ horizon_keystone_url: "{{ keystone_public_url if horizon_use_keystone_public_url
 horizon_wsgi_processes: "{{ openstack_service_workers }}"
 horizon_wsgi_threads: 1
 
+####################
+# HAProxy
+####################
+acme_frontend_http_extra:
+  - "use_backend acme_client_back if { path_reg ^/.well-known/acme-challenge/.+ }"
+horizon_frontend_http_extra: []
+horizon_external_frontend_http_extra: []
 
 ####################
 # Kolla
