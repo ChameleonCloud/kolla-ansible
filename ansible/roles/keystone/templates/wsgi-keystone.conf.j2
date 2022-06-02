@@ -86,7 +86,7 @@ LogLevel info
     OIDCRedirectURLsAllowed {{ keystone_federation_oidc_allowed_redirects | join(" ") }}
 {% endif %}
 
-    <Location ~ "/redirect_uri">
+    <Location /redirect_uri>
       Require valid-user
       AuthType openid-connect
     </Location>
@@ -99,30 +99,23 @@ LogLevel info
 
 {% for idp in keystone_identity_providers %}
 {% if idp.protocol == 'openid' %}
-    <LocationMatch /v3/auth/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/websso>
+    <Location /v3/auth/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/websso>
       OIDCDiscoverURL {{ keystone_public_url }}/redirect_uri?iss={{ idp.identifier | urlencode }}
       Require valid-user
       AuthType openid-connect
-    </LocationMatch>
+    </Location>
 {% endif %}
 {% endfor %}
-
-    {# WebSSO default redirect authentication endpoint -#}
-    <LocationMatch "^/v3/auth/OS-FEDERATION/websso/openid$">
-      Require valid-user
-      AuthType openid-connect
-      LogLevel debug
-    </LocationMatch>
 
     {# CLI / API authentication endpoint -#}
 {% for idp in keystone_identity_providers %}
 {% if idp.protocol == 'openid' -%}
-    <LocationMatch /v3/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/auth>
+    <Location /v3/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/auth>
       Require valid-user
       {# Note(jasonanderson): `auth-openidc` is a special auth type that can -#}
       {# additionally handle verifying bearer tokens -#}
       AuthType auth-openidc
-    </LocationMatch>
+    </Location>
 {% endif %}
 {% endfor %}
 {% endif %}
