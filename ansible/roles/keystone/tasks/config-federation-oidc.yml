@@ -32,13 +32,15 @@
   vars:
     keystone: "{{ keystone_services['keystone'] }}"
   become: true
-  copy:
-    src: "{{ item.metadata_folder }}/"
+  template:
+    src: "{{ item.0.metadata_folder }}/{{ item.0.identifier | regex_replace('https?://') | regex_replace('/', '%2F') }}.{{ item.1 }}"
     dest: "{{ keystone_host_federation_oidc_metadata_folder }}"
     mode: "0660"
-  with_items: "{{ keystone_identity_providers }}"
+  with_nested:
+    - "{{ keystone_identity_providers }}"
+    - ["provider", "client", "conf"]
   when:
-    - item.protocol == 'openid'
+    - item.0.protocol == 'openid'
     - inventory_hostname in groups[keystone.group]
 
 - name: Copying OpenID Identity Providers certificate
@@ -82,6 +84,6 @@
   vars:
     keystone: "{{ keystone_services['keystone'] }}"
   set_fact:
-    keystone_federation_openid_certificate_key_ids: "{{ certificates_path.files | map(attribute='path') | map('regex_replace', '^.*/(.*)\\.pem$', '\\1#' + keystone_container_federation_oidc_idp_certificate_folder + '/\\1.pem') | list }}"  # noqa 204
+    keystone_federation_openid_certificate_key_ids: "{{ certificates_path.files | map(attribute='path') | map('regex_replace', '^.*/(.*)\\.pem$', '\\1#' + keystone_container_federation_oidc_idp_certificate_folder + '/\\1.pem') | list }}" # noqa 204
   when:
     - inventory_hostname in groups[keystone.group]
