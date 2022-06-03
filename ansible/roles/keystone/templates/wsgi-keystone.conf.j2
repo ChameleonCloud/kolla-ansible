@@ -54,6 +54,7 @@ LogLevel info
 {% endif %}
 
 {% if keystone_enable_federation_openid %}
+{% set keystone_identity_providers_openid = keystone_identity_providers | selectattr('protocol','equalto','openid') | list %}
     OIDCClaimPrefix "OIDC-"
     OIDCClaimDelimiter ";"
     OIDCResponseType "{{ keystone_federation_oidc_response_type }}"
@@ -76,30 +77,30 @@ LogLevel info
 
     {# WebSSO authentication endpoint -#}
     <Location /v3/auth/OS-FEDERATION/websso/openid>
+{% if keystone_identity_providers_openid | count == 1 %}
+      {# Special case when there is only one IdP, default to it on this generic path -#}
+      OIDCDiscoverURL {{ keystone_public_url }}/redirect_uri?iss={{ keystone_identity_providers_openid[0].identifier | urlencode }}
+{% endif %}
       Require valid-user
       AuthType openid-connect
     </Location>
 
-{% for idp in keystone_identity_providers %}
-{% if idp.protocol == 'openid' %}
+{% for idp in keystone_identity_providers_openid %}
     <Location /v3/auth/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/websso>
       OIDCDiscoverURL {{ keystone_public_url }}/redirect_uri?iss={{ idp.identifier | urlencode }}
       Require valid-user
       AuthType openid-connect
     </Location>
-{% endif %}
 {% endfor %}
 
     {# CLI / API authentication endpoint -#}
-{% for idp in keystone_identity_providers %}
-{% if idp.protocol == 'openid' %}
+{% for idp in keystone_identity_providers_openid %}
     <Location /v3/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/auth>
       Require valid-user
       {# Note(jasonanderson): `auth-openidc` is a special auth type that can -#}
       {# additionally handle verifying bearer tokens -#}
       AuthType auth-openidc
     </Location>
-{% endif %}
 {% endfor %}
 {% endif %}
     {{ keystone_wsgi_public_vhost_config | indent(4) }}
