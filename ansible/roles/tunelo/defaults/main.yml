@@ -1,6 +1,4 @@
 ---
-project_name: "tunelo"
-
 tunelo_services:
   tunelo-api:
     container_name: tunelo_api
