@@ -1,6 +1,4 @@
 ---
-project_name: "doni"
-
 doni_services:
   doni-api:
     container_name: doni_api
