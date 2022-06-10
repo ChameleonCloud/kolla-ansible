@@ -3,7 +3,6 @@
   hosts: localhost
   tasks:
     - name: Template out admin-openrc.sh
-      become: true
       template:
         src: "roles/common/templates/admin-openrc.sh.j2"
         dest: "{{ admin_openrc_directory }}/admin-openrc.sh"
