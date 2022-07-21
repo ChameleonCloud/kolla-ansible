@@ -364,6 +364,7 @@ prometheus_ipmi_exporter_default_volumes:
   - "kolla_logs:/var/log/kolla/"
 prometheus_ironic_exporter_default_volumes:
   - "{{ node_config_directory }}/prometheus-ironic-exporter/:{{ container_config_directory }}/:ro"
+  - "ironic_metrics:/opt/stack/node_metrics"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
