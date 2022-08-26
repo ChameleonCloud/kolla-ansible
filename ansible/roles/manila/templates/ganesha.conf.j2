@@ -5,9 +5,24 @@ NFS_CORE_PARAM
 	Protocols = 4;
 }
 
+EXPORT_DEFAULTS
+{
+	# Time out attribute cache entries immediately
+	Attr_Expiration_Time = 0;
+}
+
 NFSv4
 {
 	Minor_Versions =  1,2;
+}
+
+# The libcephfs client will aggressively cache information while it
+# can, so there is little benefit to ganesha actively caching the same
+# objects. Doing so can also hurt cache coherency. Here, we disable
+# as much attribute and directory caching as we can.
+MDCACHE {
+	# Size the dirent cache down as small as possible.
+	Dir_Chunk = 0;
 }
 
 LOG {
