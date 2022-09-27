@@ -13,7 +13,7 @@ global
         {% endfor %}
     {% endif %}
     {% if enable_letsencrypt | bool %}
-    stats socket /var/lib/kolla/haproxy/haproxy.sock group kolla expose-fd listeners mode 660
+    stats socket /var/lib/kolla/haproxy/haproxy.sock group kolla expose-fd listeners mode 660 level admin
     {% else %}
     stats socket /var/lib/kolla/haproxy/haproxy.sock group kolla mode 660
     {% endif %}
