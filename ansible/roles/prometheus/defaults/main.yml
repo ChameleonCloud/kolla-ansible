@@ -135,6 +135,13 @@ prometheus_services:
     image: "{{ prometheus_ipmi_exporter_image_full }}"
     volumes: "{{ prometheus_ipmi_exporter_default_volumes + prometheus_ipmi_exporter_extra_volumes }}"
     dimensions: "{{ prometheus_ipmi_exporter_dimensions }}"
+  prometheus-ironic-exporter:
+    container_name: "prometheus_ironic_exporter"
+    group: "prometheus-ironic-exporter"
+    enabled: "{{ enable_prometheus_ironic_exporter | bool }}"
+    image: "{{ prometheus_ironic_exporter_image_full }}"
+    volumes: "{{ prometheus_ironic_exporter_default_volumes + prometheus_ironic_exporter_extra_volumes }}"
+    dimensions: "{{ prometheus_ironic_exporter_dimensions }}"
 
 ####################
 # Database
@@ -258,6 +265,10 @@ prometheus_ipmi_exporter_image: "{{ docker_registry ~ '/' if docker_registry els
 prometheus_ipmi_exporter_tag: "{{ prometheus_tag }}"
 prometheus_ipmi_exporter_image_full: "{{ prometheus_ipmi_exporter_image }}:{{ prometheus_ipmi_exporter_tag }}"
 
+prometheus_ironic_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-ironic-exporter"
+prometheus_ironic_exporter_tag: "{{ prometheus_tag }}"
+prometheus_ironic_exporter_image_full: "{{ prometheus_ironic_exporter_image }}:{{ prometheus_ironic_exporter_tag }}"
+
 prometheus_server_dimensions: "{{ default_container_dimensions }}"
 prometheus_pushgateway_dimensions: "{{ default_container_dimensions }}"
 prometheus_haproxy_exporter_dimensions: "{{ default_container_dimensions }}"
@@ -272,6 +283,7 @@ prometheus_blackbox_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_libvirt_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_snmp_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_ipmi_exporter_dimensions: "{{ default_container_dimensions }}"
+prometheus_ironic_exporter_dimensions: "{{ default_container_dimensions }}"
 
 prometheus_server_default_volumes:
   - "{{ node_config_directory }}/prometheus-server/:{{ container_config_directory }}/:ro"
@@ -350,6 +362,12 @@ prometheus_ipmi_exporter_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
+prometheus_ironic_exporter_default_volumes:
+  - "{{ node_config_directory }}/prometheus-ironic-exporter/:{{ container_config_directory }}/:ro"
+  - "ironic_metrics:/opt/stack/node_metrics"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
 
 prometheus_extra_volumes: "{{ default_extra_volumes }}"
 prometheus_server_extra_volumes: "{{ prometheus_extra_volumes }}"
@@ -366,6 +384,7 @@ prometheus_blackbox_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_libvirt_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_snmp_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_ipmi_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_ironic_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 
 prometheus_openstack_exporter_disabled_volume: "{{ '--disable-service.volume' if not enable_cinder | bool else '' }}"
 prometheus_openstack_exporter_disabled_dns: "{{ '--disable-service.dns' if not enable_designate | bool else '' }}"
