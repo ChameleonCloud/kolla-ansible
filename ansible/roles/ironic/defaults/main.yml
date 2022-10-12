@@ -219,6 +219,7 @@ ironic_conductor_default_volumes:
   - "/run:/run:shared"
   - "kolla_logs:/var/log/kolla"
   - "ironic:/var/lib/ironic"
+  - "ironic_metrics:/opt/stack/node_metrics"
   - "{{ kolla_dev_repos_directory ~ '/ironic/ironic:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/ironic' if ironic_dev_mode | bool else '' }}"
 ironic_tftp_default_volumes:
   - "{{ node_config_directory }}/ironic-tftp/:{{ container_config_directory }}/:ro"
