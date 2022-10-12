@@ -197,6 +197,7 @@ ironic_conductor_default_volumes:
   - "ironic:/var/lib/ironic"
   - "ironic_pxe:/tftpboot/"
   - "ironic_ipxe:/httpboot/"
+  - "ironic_metrics:/opt/stack/node_metrics"
   - "{{ kolla_dev_repos_directory ~ '/ironic/ironic:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/ironic' if ironic_dev_mode | bool else '' }}"
 ironic_pxe_default_volumes:
   - "{{ node_config_directory }}/ironic-pxe/:{{ container_config_directory }}/:ro"
