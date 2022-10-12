@@ -735,6 +735,7 @@ workaround_ansible_issue_8743: yes
 #enable_prometheus_msteams: "no"
 #enable_prometheus_snmp_exporter: "{{ enable_prometheus | bool }}"
 #enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
+#enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool and enable ironic | bool }}"
 
 # The labels to add to any time series or alerts when communicating with external systems (federation, remote storage, Alertmanager).
 # prometheus_external_labels:

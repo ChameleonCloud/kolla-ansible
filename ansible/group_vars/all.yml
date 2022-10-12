@@ -520,6 +520,8 @@ prometheus_snmp_exporter_port: "9116"
 
 prometheus_ipmi_exporter_port: "9290"
 
+prometheus_ironic_exporter_port: "9608"
+
 proxysql_admin_port: "6032"
 
 rabbitmq_port: "{{ '5671' if rabbitmq_enable_tls | bool else '5672' }}"
@@ -1176,6 +1178,7 @@ enable_prometheus_etcd_integration: "{{ enable_prometheus | bool and enable_etcd
 enable_prometheus_msteams: "no"
 enable_prometheus_jupyterhub_exporter: "{{ enable_jupyterhub | bool and enable_prometheus | bool }}"
 enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
+enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool  and enable_ironic | bool }}"
 
 prometheus_alertmanager_user: "admin"
 prometheus_scrape_interval: "60s"
@@ -1188,6 +1191,7 @@ prometheus_openstack_exporter_endpoint_type: "internal"
 prometheus_openstack_exporter_compute_api_version: "latest"
 prometheus_libvirt_exporter_interval: "60s"
 prometheus_msteams_webhook_url:
+prometheus_ironic_exporter_interval: "60s"
 
 ############
 # Vitrage

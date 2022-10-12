@@ -1,0 +1,7 @@
+[oslo_messaging_notifications]
+# Template this config separately, as the ipmi exporter fails to parse the main ironic.conf
+# in the case that `driver` is defined twice, e.g. for messagingv2 AND prometheus_exporter.
+# Ironic exporter only requires the `location` option.
+driver = prometheus_exporter
+transport_url = fake://
+location = /opt/stack/node_metrics
