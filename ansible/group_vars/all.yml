@@ -1190,7 +1190,7 @@ enable_prometheus_etcd_integration: "{{ enable_prometheus | bool and enable_etcd
 enable_prometheus_msteams: "no"
 enable_prometheus_jupyterhub_exporter: "{{ enable_jupyterhub | bool and enable_prometheus | bool }}"
 enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
-enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool  and enable_ironic | bool }}"
+enable_prometheus_ironic_exporter: "no"
 
 prometheus_alertmanager_user: "admin"
 prometheus_scrape_interval: "60s"
