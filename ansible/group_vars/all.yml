@@ -1170,7 +1170,7 @@ enable_prometheus_libvirt_exporter: "no"
 enable_prometheus_snmp_exporter: "{{ enable_prometheus | bool }}"
 enable_prometheus_jupyterhub_exporter: "{{ enable_jupyterhub | bool and enable_prometheus | bool }}"
 enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
-enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool  and enable_ironic | bool }}"
+enable_prometheus_ironic_exporter: "no"
 
 enable_prometheus_external: "no"
 
