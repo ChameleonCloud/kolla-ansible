@@ -12,7 +12,11 @@ global
     cpu-map {{ cpu_idx + 1 }} {{ cpu_idx }}
         {% endfor %}
     {% endif %}
+    {% if enable_letsencrypt | bool %}
+    stats socket /var/lib/kolla/haproxy/haproxy.sock group kolla expose-fd listeners mode 660 level admin
+    {% else %}
     stats socket /var/lib/kolla/haproxy/haproxy.sock group kolla mode 660
+    {% endif %}
     {% if kolla_enable_tls_external | bool or kolla_enable_tls_internal | bool %}
     ssl-default-bind-ciphers DEFAULT:!MEDIUM:!3DES
     ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11
