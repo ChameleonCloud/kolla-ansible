@@ -59,6 +59,7 @@
     - { src: "letsencrypt.ini.j2", dest: "letsencrypt.ini" }
     - { src: "crontab.j2", dest: "crontab" }
     - { src: "certbot-renew.sh.j2", dest: "certbot-renew.sh", mode: "0770" }
+    - { src: "haproxy-reload.sh.j2", dest: "haproxy-reload.sh", mode: "0770" }
   when:
     - inventory_hostname in groups[letsencrypt_certbot.group]
     - letsencrypt_certbot.enabled | bool
