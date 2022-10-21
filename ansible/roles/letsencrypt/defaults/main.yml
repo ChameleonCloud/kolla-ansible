@@ -53,4 +53,5 @@ letsencrypt_certbot_default_volumes:
   - "letsencrypt_acme_webroot:/www/data"
   - "kolla_logs:/var/log/kolla/"
   - "haproxy_socket:/var/lib/kolla/haproxy"
+  - "/etc/kolla/haproxy:/etc/kolla/haproxy"
 letsencrypt_certbot_extra_volumes: "{{ default_extra_volumes }}"
