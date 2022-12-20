@@ -81,3 +81,31 @@
   with_dict: "{{ blazar_services }}"
   notify:
     - Restart {{ item.key }} container
+
+- name: Check if kubeconfig exists for k8s device plugin
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: blazar_kubeconfig
+  with_first_found:
+    - files:
+        - "{{ node_custom_config }}/blazar/{{ inventory_hostname }}/kubeconfig.yml"
+        - "{{ node_custom_config }}/blazar/kubeconfig.yml"
+        - "{{ node_custom_config }}/kubeconfig.yml"
+        - "kubeconfig.yml.j2"
+      skip: true
+
+- name: Copying over kubeconfig for k8s device plugin
+  vars:
+    service_name: "{{ item.key }}"
+  copy:
+    src: "{{ blazar_kubeconfig.results.0.stat.path }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
+    mode: "0600"
+  with_dict: "{{ blazar_services }}"
+  become: true
+  when:
+    - blazar_kubeconfig.results
+    - blazar_services[service_name].enabled | bool
+    - inventory_hostname in groups[blazar_services[service_name].group]
+  notify:
+    - Restart {{ item.key }} container
