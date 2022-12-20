@@ -17,7 +17,7 @@ identity_service = identity
 api_v2_controllers = oshosts,leases
 
 [manager]
-plugins = virtual.instance.plugin,physical.host.plugin
+plugins = {% for plugin in blazar_enabled_plugins %}{{ plugin.name }}.plugin,{% endfor %}
 
 [keystone_authtoken]
 service_type = reservation
@@ -45,6 +45,16 @@ max_retries = -1
 
 [nova]
 aggregate_freepool_name = {{ blazar_aggregate_pool_name }}
+
+{% if blazar_enabled_device_plugins | count > 0 %}
+[device]
+plugins = {% for plugin in blazar_enabled_device_plugins %}{{ plugin.name }}.plugin,{% endfor %}
+{% endif %}
+
+{% if blazar_enable_device_plugin_k8s | bool %}
+[k8s]
+kubeconfig_file = /etc/blazar/kubeconfig.yml
+{% endif %}
 
 [oslo_messaging_notifications]
 {% if blazar_enabled_notification_topics %}
