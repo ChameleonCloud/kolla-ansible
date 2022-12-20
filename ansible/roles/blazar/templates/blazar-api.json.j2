@@ -6,6 +6,13 @@
             "dest": "/etc/blazar/blazar.conf",
             "owner": "blazar",
             "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/kubeconfig.yml",
+            "dest": "/etc/blazar/kubeconfig.yml",
+            "owner": "blazar",
+            "perm": "0600",
+            "optional": true
         }{% if blazar_policy_file is defined %},
         {
             "source": "{{ container_config_directory }}/{{ blazar_policy_file }}",
