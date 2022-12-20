@@ -34,13 +34,35 @@ blazar_services:
 ####################
 blazar_aggregate_pool_name: "freepool"
 
+blazar_plugins:
+  - name: "physical.host"
+    enabled: True
+  - name: "virtual.instance"
+    enabled: True
+  - name: "virtual.floatingip"
+    enabled: True
+  - name: "network"
+    enabled: "{{ blazar_enable_plugin_network | bool }}"
+  - name: "device"
+    enabled: "{{ blazar_enabled_device_plugins | count > 0 }}"
+blazar_device_plugins:
+  - name: "zun"
+    enabled: "{{ enable_zun | bool }}"
+  - name: "k8s"
+    enabled: "{{ blazar_enable_device_plugin_k8s | bool }}"
+
+blazar_enable_plugin_network: "no"
+blazar_enable_device_plugin_k8s: "no"
+
+blazar_enabled_plugins: "{{ blazar_plugins|selectattr('enabled', 'equalto', true)|list }}"
+blazar_enabled_device_plugins: "{{ blazar_device_plugins|selectattr('enabled', 'equalto', true)|list }}"
+
 ####################
 # Database
 ####################
 blazar_database_name: "blazar"
 blazar_database_user: "blazar"
 blazar_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
-
 
 ####################
 # Docker
@@ -64,7 +86,8 @@ blazar_api_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
 blazar_api_healthcheck_retries: "{{ default_container_healthcheck_retries }}"
 blazar_api_healthcheck_start_period: "{{ default_container_healthcheck_start_period }}"
 # NOTE(wuchunyang): we don't use healthcheck_url because the api returns 401(Unauthorized) which is failed.
-blazar_api_healthcheck_test: ["CMD-SHELL", "healthcheck_listen blazar-api {{ blazar_api_port }}"]
+blazar_api_healthcheck_test:
+  ["CMD-SHELL", "healthcheck_listen blazar-api {{ blazar_api_port }}"]
 blazar_api_healthcheck_timeout: "{{ default_container_healthcheck_timeout }}"
 blazar_api_healthcheck:
   interval: "{{ blazar_api_healthcheck_interval }}"
@@ -77,7 +100,8 @@ blazar_manager_enable_healthchecks: "{{ enable_container_healthchecks }}"
 blazar_manager_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
 blazar_manager_healthcheck_retries: "{{ default_container_healthcheck_retries }}"
 blazar_manager_healthcheck_start_period: "{{ default_container_healthcheck_start_period }}"
-blazar_manager_healthcheck_test: ["CMD-SHELL", "healthcheck_port blazar-manager {{ om_rpc_port }}"]
+blazar_manager_healthcheck_test:
+  ["CMD-SHELL", "healthcheck_port blazar-manager {{ om_rpc_port }}"]
 blazar_manager_healthcheck_timeout: "{{ default_container_healthcheck_timeout }}"
 blazar_manager_healthcheck:
   interval: "{{ blazar_manager_healthcheck_interval }}"
@@ -85,7 +109,6 @@ blazar_manager_healthcheck:
   start_period: "{{ blazar_manager_healthcheck_start_period }}"
   test: "{% if blazar_manager_enable_healthchecks | bool %}{{ blazar_manager_healthcheck_test }}{% else %}NONE{% endif %}"
   timeout: "{{ blazar_manager_healthcheck_timeout }}"
-
 
 blazar_api_default_volumes:
   - "{{ node_config_directory }}/blazar-api/:{{ container_config_directory }}/:ro"
@@ -117,7 +140,6 @@ blazar_keystone_user: "blazar"
 
 openstack_blazar_auth: "{{ openstack_auth }}"
 
-
 #####################
 ## Kolla
 #####################
@@ -125,7 +147,6 @@ blazar_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
 blazar_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 blazar_dev_mode: "{{ kolla_dev_mode }}"
 blazar_source_version: "{{ kolla_source_version }}"
-
 
 ####################
 # Notifications
@@ -144,9 +165,9 @@ blazar_ks_services:
     type: "reservation"
     description: "OpenStack Reservation Service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ blazar_admin_endpoint }}'}
-      - {'interface': 'internal', 'url': '{{ blazar_internal_endpoint }}'}
-      - {'interface': 'public', 'url': '{{ blazar_public_endpoint }}'}
+      - { "interface": "admin", "url": "{{ blazar_admin_endpoint }}" }
+      - { "interface": "internal", "url": "{{ blazar_internal_endpoint }}" }
+      - { "interface": "public", "url": "{{ blazar_public_endpoint }}" }
 
 blazar_ks_users:
   - project: "service"
