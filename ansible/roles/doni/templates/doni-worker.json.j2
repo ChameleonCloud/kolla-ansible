@@ -6,6 +6,13 @@
             "dest": "/etc/doni/doni.conf",
             "owner": "doni",
             "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/kubeconfig.yml",
+            "dest": "/etc/doni/kubeconfig.yml",
+            "owner": "doni",
+            "perm": "0600",
+            "optional": true
         }{% if doni_policy_file is defined %},
         {
             "source": "{{ container_config_directory }}/{{ doni_policy_file }}",
