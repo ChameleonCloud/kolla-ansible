@@ -81,3 +81,30 @@
   with_dict: "{{ doni_services }}"
   notify:
     - "Restart {{ item.key }} container"
+
+- name: Check if kubeconfig exists for k8s worker plugin
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: doni_kubeconfig
+  with_first_found:
+    - files:
+        - "{{ node_custom_config }}/doni/{{ inventory_hostname }}/kubeconfig.yml"
+        - "{{ node_custom_config }}/doni/kubeconfig.yml"
+        - "{{ node_custom_config }}/kubeconfig.yml"
+        - "kubeconfig.yml.j2"
+      skip: true
+
+- name: Copying over kubeconfig for k8s worker plugin
+  vars:
+    service_name: doni-worker
+  copy:
+    src: "{{ doni_kubeconfig.results.0.stat.path }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
+    mode: "0600"
+  become: true
+  when:
+    - doni_kubeconfig.results
+    - doni_services[service_name].enabled | bool
+    - inventory_hostname in groups[doni_services[service_name].group]
+  notify:
+    - Restart {{ service_name }} container
