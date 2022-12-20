@@ -83,6 +83,7 @@
   with_first_found:
     - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
     - "{{ node_custom_config }}/zun/kubeconfig.yml"
+    - "{{ node_custom_config }}/kubeconfig.yml"
     - "kubeconfig.yml.j2"
   become: true
   when:
