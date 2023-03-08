@@ -66,8 +66,8 @@ memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_addres
 [ironic]
 auth_url = {{ keystone_admin_url }}
 auth_type = password
-project_domain_id = default
-user_domain_id = default
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
 project_name = service
 username = {{ doni_keystone_user }}
 password = {{ doni_keystone_password }}
@@ -79,8 +79,21 @@ valid_interfaces = internal
 [blazar]
 auth_url = {{ keystone_admin_url }}
 auth_type = password
-project_domain_id = default
-user_domain_id = default
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
+project_name = service
+username = {{ doni_keystone_user }}
+password = {{ doni_keystone_password }}
+region_name = {{ openstack_region_name }}
+valid_interfaces = internal
+{% endif %}
+
+{% if enable_tunelo | bool %}
+[tunelo]
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
 project_name = service
 username = {{ doni_keystone_user }}
 password = {{ doni_keystone_password }}
@@ -92,8 +105,8 @@ valid_interfaces = internal
 {% if enable_keystone | bool %}
 auth_url = {{ keystone_admin_url }}
 auth_type = password
-project_domain_id = default
-user_domain_id = default
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
 project_name = service
 username = {{ doni_keystone_user }}
 password = {{ doni_keystone_password }}
