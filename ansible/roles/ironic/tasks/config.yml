@@ -144,6 +144,7 @@
     - service.enabled | bool
     - not enable_ironic_pxe_uefi | bool
     - not enable_ironic_ipxe | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-pxe container
 
@@ -184,6 +185,7 @@
     - service.enabled | bool
     - not enable_ironic_pxe_uefi | bool
     - not enable_ironic_ipxe | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-pxe container
 
@@ -203,6 +205,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-ipxe container
 
@@ -223,6 +226,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-ipxe container
 
