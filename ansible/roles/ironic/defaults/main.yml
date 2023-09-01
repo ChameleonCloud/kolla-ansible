@@ -274,6 +274,9 @@ ironic_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 ironic_dev_mode: "{{ kolla_dev_mode }}"
 ironic_source_version: "{{ kolla_source_version }}"
 
+# If True, (default) allow ironic inspector to run in standalone mode without
+# other openstack services. Can be set to False if always used with Ironic, Neutron, Glance, etc.
+ironic_inspector_standalone: True
 
 ####################
 # Notifications
