@@ -61,6 +61,7 @@
     - (not enable_ironic_ipxe | bool and inventory_hostname in groups['ironic-pxe']) or
         (enable_ironic_ipxe | bool and inventory_hostname in groups['ironic-ipxe'])
     - not enable_ironic_pxe_uefi | bool
+    - ironic_inspector_standalone | bool
   with_items:
     - "ironic-agent.kernel"
     - "ironic-agent.initramfs"
