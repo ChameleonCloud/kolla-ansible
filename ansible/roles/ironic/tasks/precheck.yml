@@ -74,6 +74,7 @@
     - groups['ironic-inspector'] | length > 0
     - (not ironic_dnsmasq_serve_ipxe | bool and inventory_hostname in groups['ironic-tftp']) or
         (ironic_dnsmasq_serve_ipxe | bool and inventory_hostname in groups['ironic-http'])
+    - ironic_inspector_standalone | bool
   with_items:
     - "ironic-agent.kernel"
     - "ironic-agent.initramfs"
