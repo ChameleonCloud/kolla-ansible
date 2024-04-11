@@ -185,7 +185,11 @@ nova_api_bootstrap_default_volumes:
   - "kolla_logs:/var/log/kolla/"
   - "{{ kolla_dev_repos_directory ~ '/nova/nova:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/nova' if nova_dev_mode | bool else '' }}"
 
-nova_extra_volumes: "{{ default_extra_volumes }}"
+
+nova_plugin_volumes_raw: "{% for plugin in nova_dev_plugins %}{% for pkg in plugin.packages %}{{ kolla_dev_repos_directory ~ '/nova-plugins/' ~ plugin.name ~ '/' ~ pkg ~ ':/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/' ~ pkg if nova_dev_mode | bool else '' }},{% endfor %}{% endfor %}"
+nova_plugin_volumes: "{{ nova_plugin_volumes_raw.split(',') }}"
+
+nova_extra_volumes: "{{ default_extra_volumes + nova_plugin_volumes }}"
 nova_api_extra_volumes: "{{ nova_extra_volumes }}"
 nova_scheduler_extra_volumes: "{{ nova_extra_volumes }}"
 nova_super_conductor_extra_volumes: "{{ nova_extra_volumes }}"
@@ -273,6 +277,7 @@ nova_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
 nova_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 nova_dev_mode: "{{ kolla_dev_mode }}"
 nova_source_version: "{{ kolla_source_version }}"
+nova_dev_plugins: []
 
 ####################
 # TLS
