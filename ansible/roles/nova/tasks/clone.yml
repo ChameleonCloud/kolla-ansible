@@ -6,3 +6,30 @@
     dest: "{{ kolla_dev_repos_directory }}/{{ project_name }}"
     update: "{{ nova_dev_repos_pull }}"
     version: "{{ nova_source_version }}"
+
+- name: Cloning nova plugin source repositories for development
+  become: true
+  git:
+    repo: "{{ item.git_repository | default(kolla_dev_repos_directory ~ '/' ~ item.name) }}"
+    dest: "{{ kolla_dev_repos_directory }}/{{ project_name }}-plugins/{{ item.name }}"
+    update: "{{ item.repos_pull | default(nova_dev_repos_pull) }}"
+    version: "{{ item.source_version | default(nova_source_version) }}"
+  loop: "{{ nova_dev_plugins }}"
+
+- name: change ownership on nova checkout
+  become: true
+  file:
+    path: "{{ kolla_dev_repos_directory }}/{{ project_name }}"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    state: directory
+    recurse: yes
+
+- name: change ownership on plugins checkout
+  become: true
+  file:
+    path: "{{ kolla_dev_repos_directory }}/{{ project_name }}-plugins/"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    state: directory
+    recurse: yes
