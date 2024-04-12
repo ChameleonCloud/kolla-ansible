@@ -1,6 +1,8 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Update HAProxy with new certs via its API
+set -e -u -o pipefail
+
 logfile_path="/var/log/kolla/letsencrypt/letsencrypt.log"
 print_log () {
   datetime="$(date --rfc-3339='seconds')"
@@ -27,4 +29,3 @@ for domain in {{ letsencrypt_domains | join(' ') }}; do
     show_cert_result="$(echo -e show ssl cert ${cert_path} | socat ${haproxy_socket} -)"
     print_log "new cert: ${show_cert_result}"
 done
-
