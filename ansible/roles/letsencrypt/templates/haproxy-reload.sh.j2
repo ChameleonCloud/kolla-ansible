@@ -1,15 +1,31 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Update HAProxy with new certs via its API
+set -e -u -o pipefail
 
+logfile_path="/var/log/kolla/letsencrypt/letsencrypt.log"
+print_log () {
+  datetime="$(date --rfc-3339='seconds')"
+  echo "${datetime} haproxy_renew.sh ${1}" >> "${logfile_path}"
+}
+
+haproxy_socket="/var/lib/kolla/haproxy/haproxy.sock"
 le_base=/etc/letsencrypt/live
 for domain in {{ letsencrypt_domains | join(' ') }}; do
-    cert_path="/etc/haproxy/certs.d/$domain"
+    cert_path="/etc/haproxy/certs.d/$domain.pem"
+
     # Get the full text of the certificate, deleting any blank lines (OpenSSL doesn't like those)
     full_cert=$(cat $le_base/$domain/fullchain.pem $le_base/$domain/privkey.pem | sed '/^[[:blank:]]*$/ d')
-    # Start a transaction to update the certificate
-    echo -e "set ssl cert $cert_path <<\n$full_cert\n" | socat /var/lib/kolla/haproxy/haproxy.sock -
-    # Commit the transaction
-    echo "commit ssl cert $cert_path" | socat /var/lib/kolla/haproxy/haproxy.sock -
-done
 
+    # Start a transaction to update the certificate
+    set_ssl_result=$(echo -e "set ssl cert $cert_path <<\n$full_cert\n" | socat ${haproxy_socket} -)
+    print_log "${set_ssl_result}"
+
+    # Commit the transaction
+    commit_ssl_result=$(echo "commit ssl cert $cert_path" | socat ${haproxy_socket} -)
+    print_log "${commit_ssl_result}"
+
+    # show properties of newly loaded cert
+    show_cert_result="$(echo -e show ssl cert ${cert_path} | socat ${haproxy_socket} -)"
+    print_log "new cert: ${show_cert_result}"
+done
