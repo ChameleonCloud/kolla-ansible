@@ -113,13 +113,13 @@ function find_base_dir {
                 BASEDIR=~/.local/share/kolla-ansible
             fi
         elif [[ -n ${VIRTUAL_ENV} ]] && [[ ${dir_name} == "$(readlink -e "${VIRTUAL_ENV}/bin")" ]]; then
+            local dist_info_json="$(echo ${VIRTUAL_ENV}/lib/${python_dir}/*-packages/kolla_ansible*.dist-info/direct_url.json)"
             if test -f ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla-ansible.egg-link; then
                 # Editable install.
                 BASEDIR="$(head -n1 ${VIRTUAL_ENV}/lib/${python_dir}/*-packages/kolla-ansible.egg-link)"
-            elif test -f ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla_ansible*.dist-info/direct_url.json; then
-                # Editable install in local path
-                direct_url="$(yq eval '.url' ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla_ansible*.dist-info/direct_url.json)"
-                BASEDIR="${direct_url#file:\/\/}"
+            elif test -f ${dist_info_json} && grep -q 'editable' ${dist_info_json} 2>/dev/null; then
+                # if dist_info json is present, and editable flag is set, use the url from it
+                BASEDIR="$(python -c "import json; print(json.load(open('${dist_info_json}'))['url'].replace('file://', ''))")"
             else
                 BASEDIR="${VIRTUAL_ENV}/share/kolla-ansible"
             fi
