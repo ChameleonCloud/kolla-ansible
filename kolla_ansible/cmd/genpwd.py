@@ -145,6 +145,7 @@ def main():
 
     # HMAC-MD5 keys
     hmac_md5_keys = ['designate_rndc_key',
+                     'heat_auth_encryption_key',
                      'osprofiler_secret']
 
     # Fernet keys
