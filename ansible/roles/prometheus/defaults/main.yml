@@ -225,7 +225,7 @@ prometheus_server_image: "{{ docker_registry ~ '/' if docker_registry else '' }}
 prometheus_server_tag: "{{ prometheus_tag }}"
 prometheus_server_image_full: "{{ prometheus_server_image }}:{{ prometheus_server_tag }}"
 
-prometheus_pushgateway_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-pushgateway"
+prometheus_pushgateway_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-pushgateway"
 prometheus_pushgateway_tag: "{{ prometheus_tag }}"
 prometheus_pushgateway_image_full: "{{ prometheus_pushgateway_image }}:{{ prometheus_pushgateway_tag }}"
 
@@ -274,16 +274,16 @@ prometheus_msteams_image: "{{ docker_registry ~ '/' if docker_registry else '' }
 prometheus_msteams_tag: "{{ prometheus_tag }}"
 prometheus_msteams_image_full: "{{ prometheus_msteams_image }}:{{ prometheus_msteams_tag }}"
 
-prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-snmp-exporter"
+prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-snmp-exporter"
 prometheus_snmp_exporter_tag: "{{ prometheus_tag }}"
 prometheus_snmp_exporter_image_full: "{{ prometheus_snmp_exporter_image }}:{{ prometheus_snmp_exporter_tag }}"
 prometheus_snmp_exporter_generator_image_full: prom/snmp-generator:master
 
-prometheus_ipmi_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-ipmi-exporter"
+prometheus_ipmi_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-ipmi-exporter"
 prometheus_ipmi_exporter_tag: "{{ prometheus_tag }}"
 prometheus_ipmi_exporter_image_full: "{{ prometheus_ipmi_exporter_image }}:{{ prometheus_ipmi_exporter_tag }}"
 
-prometheus_ironic_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ prometheus_install_type }}-prometheus-ironic-exporter"
+prometheus_ironic_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-ironic-exporter"
 prometheus_ironic_exporter_tag: "{{ prometheus_tag }}"
 prometheus_ironic_exporter_image_full: "{{ prometheus_ironic_exporter_image }}:{{ prometheus_ironic_exporter_tag }}"
 
