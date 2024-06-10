@@ -2,6 +2,7 @@
 - name: Creating doni database
   become: true
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: mysql_db
     module_args:
       ca_cert: "{{ openstack_cacert if database_enable_tls_internal | bool else omit }}"
@@ -22,6 +23,7 @@
 - name: Creating doni database user and setting permissions
   become: true
   kolla_toolbox:
+    container_engine: "{{ kolla_container_engine }}"
     module_name: mysql_user
     module_args:
       ca_cert: "{{ openstack_cacert if database_enable_tls_internal | bool else omit }}"
