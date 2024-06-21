@@ -25,10 +25,9 @@ tunelo_services:
 ####################
 # Docker
 ####################
-tunelo_install_type: "{{ kolla_install_type }}"
 tunelo_tag: "{{ openstack_tag }}"
 
-tunelo_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ tunelo_install_type }}-tunelo-api"
+tunelo_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/tunelo-api"
 tunelo_api_tag: "{{ tunelo_tag }}"
 tunelo_api_image_full: "{{ tunelo_api_image }}:{{ tunelo_api_tag }}"
 

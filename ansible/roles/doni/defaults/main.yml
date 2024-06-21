@@ -41,14 +41,13 @@ doni_database_address: "{{ database_address | put_address_in_context('url') }}:{
 ####################
 # Docker
 ####################
-doni_install_type: "{{ kolla_install_type }}"
 doni_tag: "{{ openstack_tag }}"
 
-doni_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ doni_install_type }}-doni-api"
+doni_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/doni-api"
 doni_api_tag: "{{ doni_tag }}"
 doni_api_image_full: "{{ doni_api_image }}:{{ doni_api_tag }}"
 
-doni_worker_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ doni_install_type }}-doni-worker"
+doni_worker_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/doni-worker"
 doni_worker_tag: "{{ doni_tag }}"
 doni_worker_image_full: "{{ doni_worker_image }}:{{ doni_worker_tag }}"
 
