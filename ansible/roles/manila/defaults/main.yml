@@ -103,7 +103,7 @@ manila_data_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ doc
 manila_data_tag: "{{ manila_tag }}"
 manila_data_image_full: "{{ manila_data_image }}:{{ manila_data_tag }}"
 
-manila_nfs_ganesha_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ manila_install_type }}-manila-nfs-ganesha"
+manila_nfs_ganesha_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/manila-nfs-ganesha"
 manila_nfs_ganesha_tag: "{{ manila_tag }}"
 manila_nfs_ganesha_image_full: "{{ manila_nfs_ganesha_image }}:{{ manila_nfs_ganesha_tag }}"
 

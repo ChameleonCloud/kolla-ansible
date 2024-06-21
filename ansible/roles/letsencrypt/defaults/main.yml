@@ -26,13 +26,11 @@ letsencrypt_services:
 ##############
 # LetsEncrypt
 ##############
-letsencrypt_install_type: "{{ kolla_install_type }}"
-
-letsencrypt_acme_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ letsencrypt_install_type }}-letsencrypt-acme"
+letsencrypt_acme_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/letsencrypt-acme"
 letsencrypt_acme_tag: "{{ openstack_tag }}"
 letsencrypt_acme_image_full: "{{ letsencrypt_acme_image }}:{{ letsencrypt_acme_tag }}"
 
-letsencrypt_certbot_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ letsencrypt_install_type }}-letsencrypt-certbot"
+letsencrypt_certbot_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/letsencrypt-certbot"
 letsencrypt_certbot_tag: "{{ openstack_tag }}"
 letsencrypt_certbot_image_full: "{{ letsencrypt_certbot_image }}:{{ letsencrypt_certbot_tag }}"
 
