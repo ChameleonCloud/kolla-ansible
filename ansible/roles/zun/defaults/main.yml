@@ -115,7 +115,7 @@ zun_cni_daemon_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ 
 zun_cni_daemon_tag: "{{ zun_tag }}"
 zun_cni_daemon_image_full: "{{ zun_cni_daemon_image }}:{{ zun_cni_daemon_tag }}"
 
-zun_compute_k8s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ zun_install_type }}-zun-compute-k8s"
+zun_compute_k8s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/zun-compute-k8s"
 zun_compute_k8s_tag: "{{ zun_tag }}"
 zun_compute_k8s_image_full: "{{ zun_compute_k8s_image }}:{{ zun_compute_k8s_tag }}"
 
