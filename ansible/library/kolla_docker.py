@@ -490,8 +490,7 @@ class DockerWorker(object):
             'memswap_limit': 'MemorySwap', 'cpu_period': 'CpuPeriod',
             'cpu_quota': 'CpuQuota', 'cpu_shares': 'CpuShares',
             'cpuset_cpus': 'CpusetCpus', 'cpuset_mems': 'CpusetMems',
-            'kernel_memory': 'KernelMemory', 'blkio_weight': 'BlkioWeight',
-            'ulimits': 'Ulimits'}
+            'blkio_weight': 'BlkioWeight', 'ulimits': 'Ulimits'}
         unsupported = set(new_dimensions.keys()) - \
             set(dimension_map.keys())
         if unsupported:
