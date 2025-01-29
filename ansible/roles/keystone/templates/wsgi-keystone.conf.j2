@@ -54,6 +54,7 @@ LogLevel info
     {# NOTE(jasonanderson): this requires Keystone change Icb77ea82a69a6766d412543d3c2fe75a736bf212 -#}
     OIDCDiscoverURL {{ keystone_public_url }}/v3/auth/OS-FEDERATION/websso/openid/discover
 {% if keystone_federation_oidc_allowed_redirects | length > 0 %}
+    OIDCXForwardedHeaders X-Forwarded-Proto
     OIDCRedirectURLsAllowed {{ keystone_federation_oidc_allowed_redirects | join(" ") }}
 {% endif %}
 

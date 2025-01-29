@@ -53,6 +53,7 @@
   file:
     state: absent
     path: "{{ node_config_directory }}/keystone/{{ item }}"
+  become: true
   with_items:
     - metadata
     - cert
@@ -67,6 +68,8 @@
     dest: "{{ node_config_directory }}/keystone/{{ item }}"
     state: "directory"
     mode: "0770"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
   become: true
   with_items:
     - metadata
