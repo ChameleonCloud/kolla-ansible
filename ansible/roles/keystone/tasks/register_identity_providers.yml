@@ -23,6 +23,7 @@
       --os-username={{ openstack_auth.username }} \
       --os-project-name={{ openstack_auth.project_name }} \
       --os-identity-api-version={{ identity_api_version }} \
+      --os-interface={{ openstack_interface }} \
     mapping list -c ID --format value
   run_once: True
   become: True
@@ -39,6 +40,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     mapping delete {{ item }}
   run_once: True
   become: true
@@ -55,6 +57,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     mapping create \
     --rules "{{ container_config_directory }}/mappings/{{ item.file | basename }}" \
     {{ item.name }}
@@ -71,6 +74,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     mapping set \
     --rules "{{ container_config_directory }}/mappings/{{ item.file | basename }}" \
     {{ item.name }}
@@ -87,6 +91,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     identity provider list -c ID --format value
   run_once: True
   become: true
@@ -103,6 +108,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     identity provider delete {{ item }}
   run_once: True
   become: true
@@ -116,6 +122,8 @@
     module_name: os_keystone_domain
     module_args:
       auth: "{{ openstack_auth }}"
+      endpoint_type: "{{ openstack_interface }}"
+      cacert: "{{ openstack_cacert }}"
       name: "{{ item.domain_name }}"
       description: "Identity domain for {{ item.name }}"
   run_once: True
@@ -132,6 +140,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     identity provider create \
     --description "{{ item.public_name }}" \
     --remote-id "{{ item.identifier }}" \
@@ -150,6 +159,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     identity provider set \
     --description "{{ item.public_name }}" \
     --remote-id "{{ item.identifier }}" \
@@ -168,6 +178,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     federation protocol create \
     --mapping {{ item.attribute_mapping }} \
     --identity-provider {{ item.name }} \
@@ -186,6 +197,7 @@
     --os-username={{ openstack_auth.username }} \
     --os-project-name={{ openstack_auth.project_name }} \
     --os-identity-api-version={{ identity_api_version }} \
+    --os-interface={{ openstack_interface }} \
     federation protocol set \
     --identity-provider {{ item.name }} \
     --mapping {{ item.attribute_mapping }} \
