@@ -24,6 +24,8 @@ keystone_services:
         external: true
         port: "{{ keystone_public_port }}"
         listen_port: "{{ keystone_public_listen_port }}"
+        backend_http_extra:
+          - balance "{{ 'source' if enable_keystone_federation | bool else 'roundrobin' }}"
       keystone_admin:
         enabled: "{{ enable_keystone }}"
         mode: "http"
