@@ -41,7 +41,7 @@ zun_services:
   zun-compute:
     container_name: zun_compute
     group: zun-compute
-    enabled: true
+    enabled: "{{ enable_zun_compute }}"
     image: "{{ zun_compute_image_full }}"
     privileged: True
     volumes: "{{ zun_compute_default_volumes + zun_compute_extra_volumes }}"
@@ -50,12 +50,20 @@ zun_services:
   zun-cni-daemon:
     container_name: zun_cni_daemon
     group: zun-cni-daemon
-    enabled: true
+    enabled: "{{ enable_zun_compute }}"
     image: "{{ zun_cni_daemon_image_full }}"
     privileged: True
     volumes: "{{ zun_cni_daemon_default_volumes + zun_cni_daemon_extra_volumes }}"
     dimensions: "{{ zun_cni_daemon_dimensions }}"
     healthcheck: "{{ zun_cni_daemon_healthcheck }}"
+  zun-compute-k8s:
+    container_name: zun_compute_k8s
+    group: zun-compute-k8s
+    enabled: "{{ enable_zun_compute_k8s }}"
+    image: "{{ zun_compute_k8s_image_full }}"
+    volumes: "{{ zun_compute_k8s_default_volumes + zun_compute_k8s_extra_volumes }}"
+    dimensions: "{{ zun_compute_k8s_dimensions }}"
+    healthcheck: "{{ zun_compute_k8s_healthcheck }}"
 
 ####################
 # Config Validate
@@ -89,6 +97,7 @@ zun_database_shard:
 ## Docker
 ####################
 zun_tag: "{{ openstack_tag }}"
+zun_docker_common_options: "{{ docker_common_options }}"
 
 zun_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/zun-api"
 zun_api_tag: "{{ zun_tag }}"
@@ -106,11 +115,15 @@ zun_cni_daemon_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ 
 zun_cni_daemon_tag: "{{ zun_tag }}"
 zun_cni_daemon_image_full: "{{ zun_cni_daemon_image }}:{{ zun_cni_daemon_tag }}"
 
+zun_compute_k8s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/zun-compute-k8s"
+zun_compute_k8s_tag: "{{ zun_tag }}"
+zun_compute_k8s_image_full: "{{ zun_compute_k8s_image }}:{{ zun_compute_k8s_tag }}"
 
 zun_api_dimensions: "{{ default_container_dimensions }}"
 zun_wsproxy_dimensions: "{{ default_container_dimensions }}"
 zun_compute_dimensions: "{{ default_container_dimensions }}"
 zun_cni_daemon_dimensions: "{{ default_container_dimensions }}"
+zun_compute_k8s_dimensions: "{{ default_container_dimensions }}"
 
 zun_api_enable_healthchecks: "{{ enable_container_healthchecks }}"
 zun_api_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
@@ -164,6 +177,20 @@ zun_cni_daemon_healthcheck:
   test: "{% if zun_cni_daemon_enable_healthchecks | bool %}{{ zun_cni_daemon_healthcheck_test }}{% else %}NONE{% endif %}"
   timeout: "{{ zun_cni_daemon_healthcheck_timeout }}"
 
+zun_compute_k8s_enable_healthchecks: "{{ enable_container_healthchecks }}"
+zun_compute_k8s_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
+zun_compute_k8s_healthcheck_retries: "{{ default_container_healthcheck_retries }}"
+zun_compute_k8s_healthcheck_start_period: "{{ default_container_healthcheck_start_period }}"
+zun_compute_k8s_healthcheck_test:
+  ["CMD-SHELL", "healthcheck_port zun-compute {{ om_rpc_port }}"]
+zun_compute_k8s_healthcheck_timeout: "{{ default_container_healthcheck_timeout }}"
+zun_compute_k8s_healthcheck:
+  interval: "{{ zun_compute_k8s_healthcheck_interval }}"
+  retries: "{{ zun_compute_k8s_healthcheck_retries }}"
+  start_period: "{{ zun_compute_k8s_healthcheck_start_period }}"
+  test: "{% if zun_compute_k8s_enable_healthchecks | bool %}{{ zun_compute_k8s_healthcheck_test }}{% else %}NONE{% endif %}"
+  timeout: "{{ zun_compute_k8s_healthcheck_timeout }}"
+
 zun_api_default_volumes:
   - "{{ node_config_directory }}/zun-api/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
@@ -187,6 +214,7 @@ zun_compute_default_volumes:
   - "/var/lib/docker:/var/lib/docker"
   - "/lib/modules:/lib/modules:ro"
   - "/dev:/dev"
+  - "/var/lib/zun:/var/lib/zun"
   - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
   - "{% if zun_configure_for_cinder_ceph | bool %}/var/lib/zun:/var/lib/zun:shared{% endif %}"
 zun_cni_daemon_default_volumes:
@@ -196,12 +224,19 @@ zun_cni_daemon_default_volumes:
   - "kolla_logs:/var/log/kolla/"
   - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
   - "/run:/run:shared"
+zun_compute_k8s_default_volumes:
+  - "{{ node_config_directory }}/zun-compute-k8s/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
 
 zun_extra_volumes: "{{ default_extra_volumes }}"
 zun_api_extra_volumes: "{{ zun_extra_volumes }}"
 zun_wsproxy_extra_volumes: "{{ zun_extra_volumes }}"
 zun_compute_extra_volumes: "{{ zun_extra_volumes }}"
 zun_cni_daemon_extra_volumes: "{{ zun_extra_volumes }}"
+zun_compute_k8s_extra_volumes: "{{ zun_extra_volumes }}"
 
 ####################
 ## OpenStack

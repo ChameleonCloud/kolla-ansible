@@ -8,12 +8,26 @@ cyborg_services:
     volumes: "{{ cyborg_api_default_volumes + cyborg_api_extra_volumes }}"
     dimensions: "{{ cyborg_api_dimensions }}"
     healthcheck: "{{ cyborg_api_healthcheck }}"
+    haproxy:
+      cyborg_api:
+        enabled: "{{ enable_cyborg }}"
+        mode: "http"
+        external: false
+        port: "{{ cyborg_api_port }}"
+        listen_port: "{{ cyborg_api_listen_port }}"
+      cyborg_api_external:
+        enabled: "{{ enable_cyborg }}"
+        mode: "http"
+        external: true
+        port: "{{ cyborg_api_port }}"
+        listen_port: "{{ cyborg_api_listen_port }}"
   cyborg-agent:
     container_name: cyborg_agent
     group: cyborg-agent
     enabled: true
     privileged: true
     image: "{{ cyborg_agent_image_full }}"
+    environment: "{{ cyborg_agent_environment }}"
     volumes: "{{ cyborg_agent_default_volumes + cyborg_agent_extra_volumes }}"
     dimensions: "{{ cyborg_agent_dimensions }}"
     healthcheck: "{{ cyborg_agent_healthcheck }}"
@@ -71,6 +85,8 @@ cyborg_conductor_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{
 cyborg_conductor_tag: "{{ cyborg_tag }}"
 cyborg_conductor_image_full: "{{ cyborg_conductor_image }}:{{ cyborg_conductor_tag }}"
 
+cyborg_agent_environment: {}
+
 cyborg_api_dimensions: "{{ default_container_dimensions }}"
 cyborg_agent_dimensions: "{{ default_container_dimensions }}"
 cyborg_conductor_dimensions: "{{ default_container_dimensions }}"
@@ -120,18 +136,21 @@ cyborg_api_default_volumes:
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "cyborg:/var/lib/cyborg/"
   - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cyborg/cyborg:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cyborg' if cyborg_dev_mode | bool else '' }}"
 
 cyborg_agent_default_volumes:
   - "{{ node_config_directory }}/cyborg-agent/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cyborg/cyborg:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cyborg' if cyborg_dev_mode | bool else '' }}"
 
 cyborg_conductor_default_volumes:
   - "{{ node_config_directory }}/cyborg-conductor/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cyborg/cyborg:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cyborg' if cyborg_dev_mode | bool else '' }}"
 
 cyborg_extra_volumes: "{{ default_extra_volumes }}"
 cyborg_api_extra_volumes: "{{ cyborg_extra_volumes }}"
@@ -159,6 +178,14 @@ cyborg_notification_topics:
     enabled: "{{ enable_ceilometer | bool }}"
 
 cyborg_enabled_notification_topics: "{{ cyborg_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Kolla
+####################
+cyborg_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+cyborg_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+cyborg_dev_mode: "{{ kolla_dev_mode }}"
+cyborg_source_version: "{{ kolla_source_version }}"
 
 ####################
 # Keystone

@@ -54,6 +54,8 @@
         - kolla-ansible-rocky9-cephadm
         - kolla-ansible-ubuntu-cephadm
         - kolla-ansible-rocky9-hashi-vault
+        - kolla-ansible-ubuntu-lets-encrypt
+        - kolla-ansible-rocky9-lets-encrypt
     check-arm64:
       jobs:
         - kolla-ansible-debian-bullseye-aarch64

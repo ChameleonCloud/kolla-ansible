@@ -137,14 +137,16 @@ def main():
 
     # SSH key pair
     ssh_keys = ['kolla_ssh_key', 'nova_ssh_key',
-                'keystone_ssh_key', 'bifrost_ssh_key', 'octavia_amp_ssh_key',
-                'neutron_ssh_key']
+                'keystone_ssh_key', 'bifrost_ssh_key',
+                'octavia_amp_ssh_key', 'neutron_ssh_key',
+                'haproxy_ssh_key']
 
     # If these keys are None, leave them as None
     blank_keys = ['docker_registry_password']
 
     # HMAC-MD5 keys
     hmac_md5_keys = ['designate_rndc_key',
+                     'heat_auth_encryption_key',
                      'osprofiler_secret']
 
     # Fernet keys

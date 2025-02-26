@@ -1,0 +1,17 @@
+{
+    "command": "/usr/bin/ganesha.nfsd -F -L /dev/stdout -f /etc/ganesha/ganesha.conf",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/ganesha.conf",
+            "dest": "/etc/ganesha/ganesha.conf",
+            "owner": "manila",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/ceph.conf",
+            "dest": "/etc/ceph/ceph.conf",
+            "owner": "manila",
+            "perm": "0600"
+        }
+    ]
+}

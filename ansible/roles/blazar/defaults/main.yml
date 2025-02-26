@@ -28,11 +28,39 @@ blazar_services:
     dimensions: "{{ blazar_manager_dimensions }}"
     healthcheck: "{{ blazar_manager_healthcheck }}"
 
+blazar_network_plugins:
+  - name: "storage"
+    enabled: "{{ blazar_enable_network_plugin_storage | bool }}"
+
+blazar_enable_network_plugin_storage: "no"
+blazar_enabled_network_plugins: "{{ blazar_network_plugins|selectattr('enabled', 'equalto', true)|list }}"
 
 ####################
 # Blazar
 ####################
 blazar_aggregate_pool_name: "freepool"
+blazar_plugins:
+  - name: "physical.host"
+    enabled: True
+  - name: "virtual.instance"
+    enabled: True
+  - name: "virtual.floatingip"
+    enabled: True
+  - name: "network"
+    enabled: "{{ blazar_enable_plugin_network | bool }}"
+  - name: "device"
+    enabled: "{{ blazar_enabled_device_plugins | count > 0 }}"
+blazar_device_plugins:
+  - name: "zun"
+    enabled: "{{ enable_zun | bool }}"
+  - name: "k8s"
+    enabled: "{{ blazar_enable_device_plugin_k8s | bool }}"
+
+blazar_enable_plugin_network: "no"
+blazar_enable_device_plugin_k8s: "no"
+
+blazar_enabled_plugins: "{{ blazar_plugins|selectattr('enabled', 'equalto', true)|list }}"
+blazar_enabled_device_plugins: "{{ blazar_device_plugins|selectattr('enabled', 'equalto', true)|list }}"
 
 ####################
 # Config Validate

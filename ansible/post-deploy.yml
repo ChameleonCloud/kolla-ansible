@@ -24,10 +24,9 @@
   hosts: localhost
   tasks:
     - name: Template out admin-openrc.sh
-      become: true
       template:
         src: "roles/common/templates/admin-openrc.sh.j2"
-        dest: "{{ node_config }}/admin-openrc.sh"
+        dest: "{{ admin_openrc_directory }}/admin-openrc.sh"
         owner: "{{ ansible_facts.user_uid }}"
         group: "{{ ansible_facts.user_gid }}"
         mode: 0600
@@ -36,3 +35,6 @@
         name: octavia
         tasks_from: openrc.yml
       when: enable_octavia | bool
+
+- import_playbook: "{{ post_deploy_extra_play }}"
+  when: post_deploy_extra_play is defined

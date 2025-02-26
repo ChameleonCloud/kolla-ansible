@@ -21,6 +21,12 @@
   notify:
     - "Restart openvswitch-vswitchd container"
 
+- name: Compute facts for bridge and external interface names
+  set_fact:
+    neutron_bridge_name: "{{ neutron_networks | selectattr('external_interface', 'defined') | map(attribute='bridge_name') | join(',') }}"
+    neutron_external_interface: "{{ neutron_networks | selectattr('external_interface', 'defined') | map(attribute='external_interface') | join(',') }}"
+  when: neutron_networks is defined
+
 - name: Ensuring OVS bridge is properly setup
   become: true
   command: "{{ kolla_container_engine }} exec openvswitch_db /usr/local/bin/kolla_ensure_openvswitch_configured {{ item.0 }} {{ item.1 }}"

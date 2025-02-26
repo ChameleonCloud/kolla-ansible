@@ -32,7 +32,7 @@
 - name: Find custom prometheus alert rules files
   find:
     path: "{{ node_custom_config }}/prometheus/"
-    pattern: "*.rules"
+    pattern: "*.rules.yml"
   run_once: True
   delegate_to: localhost
   register: prometheus_alert_rules
@@ -96,6 +96,32 @@
     - "{{ role_path }}/templates/prometheus.yml.j2"
   notify:
     - Restart prometheus-server container
+
+- name: Find custom alertmanager template files
+  local_action:
+    module: find
+    path: "{{ node_custom_config }}/prometheus/"
+    pattern: "*.tmpl"
+  run_once: True
+  register: prometheus_alert_templates
+  when:
+    - enable_prometheus_alertmanager | bool
+
+- name: Copying over custom prometheus alert rules files
+  become: true
+  vars:
+    service: "{{ prometheus_services['prometheus-alertmanager']}}"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ node_config_directory }}/prometheus-alertmanager/{{ item.path | basename }}"
+    mode: "0660"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool and enable_prometheus_alertmanager | bool
+    - prometheus_alert_templates is defined and prometheus_alert_templates.files | length > 0
+  with_items: "{{ prometheus_alert_templates.files }}"
+  notify:
+    - Restart prometheus-alertmanager container
 
 - name: Copying over prometheus alertmanager config file
   become: true
@@ -271,3 +297,73 @@
     - "{{ role_path }}/templates/prometheus-msteams.tmpl"
   notify:
     - Restart prometheus-msteams container
+
+- name: Create generator config file for SNMP exporter
+  become: true
+  vars:
+    service: "{{ prometheus_services['prometheus-snmp-exporter'] }}"
+  template:
+    src: "{{ item }}"
+    dest: "{{ node_config_directory }}/prometheus-snmp-exporter/generator.yml"
+    mode: "0660"
+  register: prometheus_snmp_exporter_generator_config
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ node_custom_config }}/prometheus/{{ inventory_hostname }}/prometheus-snmp-exporter-generator.yml"
+    - "{{ node_custom_config }}/prometheus/prometheus-snmp-exporter-generator.yml"
+    - "{{ role_path }}/templates/prometheus-snmp-exporter-generator.yml.j2"
+
+- name: Generate config file for SNMP exporter
+  become: true
+  vars:
+    service: "{{ prometheus_services['prometheus-snmp-exporter'] }}"
+  command: >
+    docker run --rm \
+      --mount type=bind,src={{ node_config_directory }}/prometheus-snmp-exporter,dst=/opt \
+      {{ prometheus_snmp_exporter_generator_image_full }} \
+      generate
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - prometheus_snmp_exporter_generator_config.changed
+  notify:
+    - Restart prometheus-snmp-exporter container
+
+- name: Copying config file for IPMI exporter
+  become: true
+  vars:
+    service: "{{ prometheus_services['prometheus-ipmi-exporter'] }}"
+  template:
+    src: "{{ item }}"
+    dest: "{{ node_config_directory }}/prometheus-ipmi-exporter/prometheus-ipmi-exporter.yml"
+    mode: "0660"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ node_custom_config }}/prometheus/{{ inventory_hostname }}/prometheus-ipmi-exporter.yml"
+    - "{{ node_custom_config }}/prometheus/prometheus-ipmi-exporter.yml"
+    - "{{ role_path }}/templates/prometheus-ipmi-exporter.yml.j2"
+  notify:
+    - Restart prometheus-ipmi-exporter container
+
+- name: Copying ironic.conf for prometheus ironic exporter
+  become: true
+  vars:
+    service: "{{ prometheus_services['prometheus-ironic-exporter'] }}"
+  template:
+    src: "{{ item }}"
+    dest: "{{ node_config_directory }}/prometheus-ironic-exporter/ironic.conf"
+    mode: "0660"
+  when:
+    - enable_prometheus_ironic_exporter | bool
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_first_found:
+    - "{{ node_custom_config }}/prometheus/{{ inventory_hostname }}/prometheus-ironic-exporter.conf"
+    - "{{ node_custom_config }}/prometheus/prometheus-ironic-exporter.conf"
+    - "{{ role_path }}/templates/prometheus-ironic-exporter.conf.j2"
+  notify:
+    - Restart prometheus-ironic-exporter container

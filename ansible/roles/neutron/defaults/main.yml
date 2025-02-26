@@ -6,7 +6,7 @@ neutron_services:
     enabled: true
     group: "neutron-server"
     host_in_groups: "{{ inventory_hostname in groups['neutron-server'] }}"
-    volumes: "{{ neutron_server_default_volumes + neutron_server_extra_volumes }}"
+    volumes: "{{ neutron_server_default_volumes + neutron_server_plugin_volumes + neutron_server_extra_volumes }}"
     dimensions: "{{ neutron_server_dimensions }}"
     healthcheck: "{{ neutron_server_healthcheck }}"
     haproxy:
@@ -206,6 +206,15 @@ neutron_services:
     volumes: "{{ neutron_ovn_agent_default_volumes + neutron_ovn_agent_extra_volumes }}"
     dimensions: "{{ neutron_ovn_agent_dimensions }}"
     healthcheck: "{{ neutron_ovn_agent_healthcheck }}"
+  neutron-wireguard-agent:
+    container_name: "neutron_wireguard_agent"
+    image: "{{ neutron_wireguard_agent_image_full }}"
+    enabled: "{{ enable_neutron_wireguard | bool }}"
+    privileged: True
+    host_in_groups: >-
+      {{ inventory_hostname in groups['neutron-l3-agent'] }}
+    volumes: "{{ neutron_wireguard_agent_default_volumes + neutron_server_plugin_volumes + neutron_wireguard_agent_extra_volumes }}"
+    dimensions: "{{ neutron_wireguard_agent_dimensions }}"
 
 ####################
 # Config Validate
@@ -325,6 +334,10 @@ neutron_ovn_agent_image: "{{ docker_registry ~ '/' if docker_registry else '' }}
 neutron_ovn_agent_tag: "{{ neutron_tag }}"
 neutron_ovn_agent_image_full: "{{ neutron_ovn_agent_image }}:{{ neutron_ovn_agent_tag }}"
 
+neutron_wireguard_agent_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/neutron-wireguard-agent"
+neutron_wireguard_agent_tag: "{{ neutron_tag }}"
+neutron_wireguard_agent_image_full: "{{ neutron_wireguard_agent_image }}:{{ neutron_wireguard_agent_tag }}"
+
 neutron_agent_dimensions: "{{ default_container_dimensions }}"
 
 neutron_dhcp_agent_dimensions: "{{ neutron_agent_dimensions }}"
@@ -343,6 +356,7 @@ neutron_metering_agent_dimensions: "{{ neutron_agent_dimensions }}"
 ironic_neutron_agent_dimensions: "{{ default_container_dimensions }}"
 neutron_tls_proxy_dimensions: "{{ default_container_dimensions }}"
 neutron_ovn_agent_dimensions: "{{ neutron_agent_dimensions }}"
+neutron_wireguard_agent_dimensions: "{{ default_container_dimensions }}"
 
 neutron_dhcp_agent_enable_healthchecks: "{{ enable_container_healthchecks }}"
 neutron_dhcp_agent_healthcheck_interval: "{{ default_container_healthcheck_interval }}"
@@ -572,6 +586,8 @@ neutron_server_default_volumes:
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
   - "{{ kolla_dev_repos_directory ~ '/neutron/neutron:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/neutron' if neutron_dev_mode | bool else '' }}"
+neutron_server_plugin_volumes_raw: "{% for plugin in neutron_dev_plugins %}{% for pkg in plugin.packages %}{{ kolla_dev_repos_directory ~ '/neutron-plugins/' ~ plugin.name ~ '/' ~ pkg ~ ':/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/' ~ pkg if neutron_dev_mode | bool else '' }},{% endfor %}{% endfor %}"
+neutron_server_plugin_volumes: "{{ neutron_server_plugin_volumes_raw.split(',') }}"
 neutron_bgp_dragent_default_volumes:
   - "{{ node_config_directory }}/neutron-bgp-dragent/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
@@ -603,6 +619,13 @@ neutron_ovn_agent_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
+neutron_wireguard_agent_default_volumes:
+  - "{{ node_config_directory }}/neutron-wireguard-agent/:{{ container_config_directory }}/:ro"
+  - "/run/netns:/run/netns:shared"
+  - neutron_wireguard:/etc/neutron/plugins/wireguard
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
 
 neutron_extra_volumes: "{{ default_extra_volumes }}"
 neutron_dhcp_agent_extra_volumes: "{{ neutron_extra_volumes }}"
@@ -621,6 +644,7 @@ neutron_metering_agent_extra_volumes: "{{ neutron_extra_volumes }}"
 ironic_neutron_agent_extra_volumes: "{{ neutron_extra_volumes }}"
 neutron_tls_proxy_extra_volumes: "{{ neutron_extra_volumes }}"
 neutron_ovn_agent_extra_volumes: "{{ neutron_extra_volumes }}"
+neutron_wireguard_agent_extra_volumes: "{{ neutron_extra_volumes }}"
 
 ####################
 # OpenStack
@@ -667,6 +691,8 @@ neutron_subprojects:
 # Mechanism drivers
 ####################
 mechanism_drivers:
+  - name: "wireguard"
+    enabled: "{{ enable_neutron_wireguard | bool }}"
   - name: "linuxbridge"
     enabled: "{{ neutron_plugin_agent == 'linuxbridge' }}"
   - name: "openvswitch"
@@ -681,6 +707,8 @@ mechanism_drivers:
     enabled: "{{ neutron_plugin_agent == 'ovn' }}"
   - name: "sriovnicswitch"
     enabled: "{{ enable_neutron_sriov | bool }}"
+  - name: "genericswitch"
+    enabled: "{{ enable_neutron_genericswitch | bool }}"
 
 neutron_mechanism_drivers: "{{ mechanism_drivers | selectattr('enabled', 'equalto', true) | list }}"
 
@@ -874,6 +902,7 @@ neutron_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
 neutron_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 neutron_dev_mode: "{{ kolla_dev_mode }}"
 neutron_source_version: "{{ kolla_source_version }}"
+neutron_dev_plugins: []
 
 ####################
 # Keystone

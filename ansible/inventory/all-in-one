@@ -210,6 +210,9 @@ control
 [venus:children]
 monitoring
 
+[letsencrypt:children]
+loadbalancer
+
 # Additional control implemented here. These groups allow you to control which
 # services run on which hosts at a per-service level.
 #
@@ -345,6 +348,9 @@ manila
 network
 
 [manila-data:children]
+manila
+
+[manila-nfs-ganesha:children]
 manila
 
 # Swift
@@ -668,6 +674,9 @@ compute
 network
 storage
 
+[prometheus-pushgateway:children]
+monitoring
+
 [prometheus-mysqld-exporter:children]
 mariadb
 
@@ -701,6 +710,9 @@ compute
 
 [prometheus-msteams:children]
 prometheus-alertmanager
+
+[prometheus-snmp-exporter:children]
+monitoring
 
 [masakari-api:children]
 control
@@ -741,3 +753,24 @@ venus
 
 [venus-manager:children]
 venus
+
+[letsencrypt-webserver:children]
+letsencrypt
+
+[letsencrypt-lego:children]
+letsencrypt
+
+[doni:children]
+control
+
+[doni-api:children]
+doni
+
+[doni-worker:children]
+doni
+
+[tunelo:children]
+control
+
+[tunelo-api:children]
+tunelo

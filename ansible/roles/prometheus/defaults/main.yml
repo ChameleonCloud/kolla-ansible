@@ -14,6 +14,13 @@ prometheus_services:
         external: false
         port: "{{ prometheus_port }}"
         active_passive: "{{ prometheus_active_passive | bool }}"
+  prometheus-pushgateway:
+    container_name: prometheus_pushgateway
+    group: prometheus-pushgateway
+    enabled: "{{ enable_prometheus_pushgateway | bool }}"
+    image: "{{ prometheus_pushgateway_image_full }}"
+    volumes: "{{ prometheus_pushgateway_default_volumes + prometheus_pushgateway_extra_volumes }}"
+    dimensions: "{{ prometheus_pushgateway_dimensions }}"
   prometheus-node-exporter:
     container_name: prometheus_node_exporter
     group: prometheus-node-exporter
@@ -127,6 +134,27 @@ prometheus_services:
     image: "{{ prometheus_msteams_image_full }}"
     volumes: "{{ prometheus_msteams_default_volumes + prometheus_msteams_extra_volumes }}"
     dimensions: "{{ prometheus_msteams_dimensions }}"
+  prometheus-snmp-exporter:
+    container_name: "prometheus_snmp_exporter"
+    group: "prometheus-snmp-exporter"
+    enabled: "{{ enable_prometheus_snmp_exporter | bool }}"
+    image: "{{ prometheus_snmp_exporter_image_full }}"
+    volumes: "{{ prometheus_snmp_exporter_default_volumes + prometheus_snmp_exporter_extra_volumes }}"
+    dimensions: "{{ prometheus_snmp_exporter_dimensions }}"
+  prometheus-ipmi-exporter:
+    container_name: "prometheus_ipmi_exporter"
+    group: "prometheus-ipmi-exporter"
+    enabled: "{{ enable_prometheus_ipmi_exporter | bool }}"
+    image: "{{ prometheus_ipmi_exporter_image_full }}"
+    volumes: "{{ prometheus_ipmi_exporter_default_volumes + prometheus_ipmi_exporter_extra_volumes }}"
+    dimensions: "{{ prometheus_ipmi_exporter_dimensions }}"
+  prometheus-ironic-exporter:
+    container_name: "prometheus_ironic_exporter"
+    group: "prometheus-ironic-exporter"
+    enabled: "{{ enable_prometheus_ironic_exporter | bool }}"
+    image: "{{ prometheus_ironic_exporter_image_full }}"
+    volumes: "{{ prometheus_ironic_exporter_default_volumes + prometheus_ironic_exporter_extra_volumes }}"
+    dimensions: "{{ prometheus_ironic_exporter_dimensions }}"
 
 ####################
 # Prometheus Server
@@ -159,6 +187,36 @@ prometheus_alertmanager_active_passive: true
 prometheus_blackbox_exporter_endpoints: []
 
 ####################
+# OpenStack
+####################
+
+# Additional arguments to pass to the exporter's run command.
+# See https://github.com/openstack-exporter/openstack-exporter#command-line-options
+# for a list of possible options. Put options as they would appear on the
+# command line, e.g.:
+#
+# prometheus_openstack_exporter_cmdline_extras: "--disable-slow-metrics"
+prometheus_openstack_exporter_cmdline_extras: ""
+
+####################
+# SNMP
+####################
+
+# prometheus_snmp_exporter_modules:
+#   - name: dell_force10
+#     endpoints:
+#       - '10.0.0.1'
+#       - '10.0.0.2'
+prometheus_snmp_exporter_modules: []
+
+####################
+# IPMI
+####################
+
+prometheus_ipmi_exporter_modules: []
+prometheus_ipmi_exporter_endpoints: []
+
+####################
 # Docker
 ####################
 prometheus_tag: "{{ openstack_tag }}"
@@ -166,6 +224,10 @@ prometheus_tag: "{{ openstack_tag }}"
 prometheus_server_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-v2-server"
 prometheus_server_tag: "{{ prometheus_tag }}"
 prometheus_server_image_full: "{{ prometheus_server_image }}:{{ prometheus_server_tag }}"
+
+prometheus_pushgateway_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-pushgateway"
+prometheus_pushgateway_tag: "{{ prometheus_tag }}"
+prometheus_pushgateway_image_full: "{{ prometheus_pushgateway_image }}:{{ prometheus_pushgateway_tag }}"
 
 prometheus_haproxy_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-haproxy-exporter"
 prometheus_haproxy_exporter_tag: "{{ prometheus_tag }}"
@@ -212,7 +274,21 @@ prometheus_msteams_image: "{{ docker_registry ~ '/' if docker_registry else '' }
 prometheus_msteams_tag: "{{ prometheus_tag }}"
 prometheus_msteams_image_full: "{{ prometheus_msteams_image }}:{{ prometheus_msteams_tag }}"
 
+prometheus_snmp_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-snmp-exporter"
+prometheus_snmp_exporter_tag: "{{ prometheus_tag }}"
+prometheus_snmp_exporter_image_full: "{{ prometheus_snmp_exporter_image }}:{{ prometheus_snmp_exporter_tag }}"
+prometheus_snmp_exporter_generator_image_full: prom/snmp-generator:master
+
+prometheus_ipmi_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-ipmi-exporter"
+prometheus_ipmi_exporter_tag: "{{ prometheus_tag }}"
+prometheus_ipmi_exporter_image_full: "{{ prometheus_ipmi_exporter_image }}:{{ prometheus_ipmi_exporter_tag }}"
+
+prometheus_ironic_exporter_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/prometheus-ironic-exporter"
+prometheus_ironic_exporter_tag: "{{ prometheus_tag }}"
+prometheus_ironic_exporter_image_full: "{{ prometheus_ironic_exporter_image }}:{{ prometheus_ironic_exporter_tag }}"
+
 prometheus_server_dimensions: "{{ default_container_dimensions }}"
+prometheus_pushgateway_dimensions: "{{ default_container_dimensions }}"
 prometheus_haproxy_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_mysqld_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_node_exporter_dimensions: "{{ default_container_dimensions }}"
@@ -224,12 +300,19 @@ prometheus_elasticsearch_exporter_dimensions: "{{ default_container_dimensions }
 prometheus_blackbox_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_libvirt_exporter_dimensions: "{{ default_container_dimensions }}"
 prometheus_msteams_dimensions: "{{ default_container_dimensions }}"
+prometheus_snmp_exporter_dimensions: "{{ default_container_dimensions }}"
+prometheus_ipmi_exporter_dimensions: "{{ default_container_dimensions }}"
+prometheus_ironic_exporter_dimensions: "{{ default_container_dimensions }}"
 
 prometheus_server_default_volumes:
   - "{{ node_config_directory }}/prometheus-server/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "prometheus_v2:/var/lib/prometheus"
+  - "kolla_logs:/var/log/kolla/"
+prometheus_pushgateway_default_volumes:
+  - "{{ node_config_directory }}/prometheus-pushgateway/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
   - "kolla_logs:/var/log/kolla/"
 prometheus_haproxy_exporter_default_volumes:
   - "{{ node_config_directory }}/prometheus-haproxy-exporter/:{{ container_config_directory }}/:ro"
@@ -294,9 +377,25 @@ prometheus_msteams_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla/"
+prometheus_snmp_exporter_default_volumes:
+  - "{{ node_config_directory }}/prometheus-snmp-exporter/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+prometheus_ipmi_exporter_default_volumes:
+  - "{{ node_config_directory }}/prometheus-ipmi-exporter/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+prometheus_ironic_exporter_default_volumes:
+  - "{{ node_config_directory }}/prometheus-ironic-exporter/:{{ container_config_directory }}/:ro"
+  - "ironic_metrics:/opt/stack/node_metrics"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla/"
 
 prometheus_extra_volumes: "{{ default_extra_volumes }}"
 prometheus_server_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_pushgateway_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_haproxy_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_mysqld_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_node_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
@@ -308,6 +407,9 @@ prometheus_elasticsearch_exporter_extra_volumes: "{{ prometheus_extra_volumes }}
 prometheus_blackbox_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_libvirt_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 prometheus_msteams_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_snmp_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_ipmi_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
+prometheus_ironic_exporter_extra_volumes: "{{ prometheus_extra_volumes }}"
 
 prometheus_msteams_container_proxy: "{{ container_proxy }}"
 

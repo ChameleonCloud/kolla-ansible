@@ -27,9 +27,11 @@ scrape_configs:
 {% if enable_prometheus_node_exporter | bool %}
   - job_name: node
     static_configs:
-      - targets:
 {% for host in groups['prometheus-node-exporter'] %}
-        - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_node_exporter_port'] }}'
+      - targets:
+          - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_node_exporter_port'] }}'
+        labels:
+          hostname: '{{ host }}'
 {% endfor %}
 {% endif %}
 
@@ -72,18 +74,22 @@ scrape_configs:
 {% if enable_prometheus_cadvisor | bool %}
   - job_name: cadvisor
     static_configs:
-      - targets:
 {% for host in groups["prometheus-cadvisor"] %}
+      - targets:
         - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_cadvisor_port'] }}'
+        labels:
+          hostname: '{{ host }}'
 {% endfor %}
 {% endif %}
 
 {% if enable_prometheus_fluentd_integration | bool %}
   - job_name: fluentd
     static_configs:
-      - targets:
 {% for host in groups['fluentd'] %}
-        - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_fluentd_integration_port'] }}'
+      - targets:
+          - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_fluentd_integration_port'] }}'
+        labels:
+          hostname: '{{ host }}'
 {% endfor %}
 {% endif %}
 
@@ -170,6 +176,99 @@ scrape_configs:
       - targets:
 {% for host in groups["etcd"] %}
         - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_etcd_integration_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_pushgateway | bool %}
+  - job_name: pushgateway
+    static_configs:
+      - targets:
+{% for host in groups["prometheus-pushgateway"] %}
+        - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_pushgateway_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_snmp_exporter | bool and prometheus_snmp_exporter_modules | length > 0 %}
+{% for module in prometheus_snmp_exporter_modules %}
+  - job_name: snmp_exporter_{{ module.name }}
+    metrics_path: /snmp
+    scrape_interval: 2m
+    scrape_timeout: 2m
+    static_configs:
+    - targets:
+{% for target in module.endpoints|default([]) %}
+        - '{{ target }}'
+{% endfor %}
+    params:
+      module:
+        - '{{ module.name }}'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      {% set host = groups['prometheus-snmp-exporter'][0] %}
+      - target_label: __address__
+        replacement: '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_snmp_exporter_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_jupyterhub_exporter | bool %}
+  - job_name: jupyterhub_exporter
+    honor_labels: true
+{% if prometheus_jupyterhub_exporter_token %}
+    bearer_token: '{{ prometheus_jupyterhub_exporter_token }}'
+{% endif %}
+    static_configs:
+      - targets:
+{% for host in groups['jupyterhub'] %}
+        - '{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_jupyterhub_exporter_port'] }}'
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_ipmi_exporter | bool %}
+{% for module in prometheus_ipmi_exporter_modules %}
+  - job_name: ipmi
+    params:
+      module: ['{{ module.name }}']
+    scrape_interval: 1m
+    scrape_timeout: 30s
+    metrics_path: /ipmi
+    scheme: http
+    static_configs:
+      - targets:
+{% for target in module.endpoints %}
+        - '{{ target }}'
+{% endfor %}
+    relabel_configs:
+      - source_labels: [__address__]
+        separator: ;
+        regex: (.*)
+        target_label: __param_target
+        replacement: ${1}
+        action: replace
+      - source_labels: [__param_target]
+        separator: ;
+        regex: (.*)
+        target_label: instance
+        replacement: ${1}
+        action: replace
+      - separator: ;
+        regex: .*
+        target_label: __address__
+        replacement: '{{ api_interface_address | put_address_in_context('url') }}:9290'
+        action: replace
+{% endfor %}
+{% endif %}
+
+{% if enable_prometheus_ironic_exporter | bool %}
+  - job_name: ironic_exporter
+    scrape_interval: "{{ prometheus_ironic_exporter_interval }}"
+    honor_labels: true
+    static_configs:
+      - targets:
+{% for host in groups["prometheus-ironic-exporter"] %}
+        - "{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ hostvars[host]['prometheus_ironic_exporter_port'] }}"
 {% endfor %}
 {% endif %}
 

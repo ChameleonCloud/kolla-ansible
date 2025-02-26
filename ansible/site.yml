@@ -28,6 +28,7 @@
         - enable_collectd_{{ enable_collectd | bool }}
         - enable_cyborg_{{ enable_cyborg | bool }}
         - enable_designate_{{ enable_designate | bool }}
+        - enable_doni_{{ enable_doni | bool }}
         - enable_etcd_{{ enable_etcd | bool }}
         - enable_freezer_{{ enable_freezer | bool }}
         - enable_glance_{{ enable_glance | bool }}
@@ -41,6 +42,7 @@
         - enable_iscsid_{{ enable_iscsid | bool }}
         - enable_keystone_{{ enable_keystone | bool }}
         - enable_kuryr_{{ enable_kuryr | bool }}
+        - enable_letsencrypt_{{ enable_letsencrypt | bool }}
         - enable_loadbalancer_{{ enable_loadbalancer | bool }}
         - enable_magnum_{{ enable_magnum | bool }}
         - enable_manila_{{ enable_manila | bool }}
@@ -71,6 +73,7 @@
         - enable_telegraf_{{ enable_telegraf | bool }}
         - enable_trove_{{ enable_trove | bool }}
         - enable_venus_{{ enable_venus | bool }}
+        - enable_tunelo_{{ enable_tunelo | bool }}
         - enable_vitrage_{{ enable_vitrage | bool }}
         - enable_watcher_{{ enable_watcher | bool }}
         - enable_zun_{{ enable_zun | bool }}
@@ -151,6 +154,11 @@
           tags: designate
           when: enable_designate | bool
         - include_role:
+            name: doni
+            tasks_from: loadbalancer
+          tags: doni
+          when: enable_doni | bool
+        - include_role:
             name: etcd
             tasks_from: loadbalancer
           tags: etcd
@@ -200,6 +208,11 @@
             tasks_from: loadbalancer
           tags: keystone
           when: enable_keystone | bool
+        - include_role:
+            name: letsencrypt
+            tasks_from: loadbalancer
+          tags: letsencrypt
+          when: enable_letsencrypt | bool
         - include_role:
             name: magnum
             tasks_from: loadbalancer
@@ -322,6 +335,11 @@
           tags: venus
           when: enable_venus | bool
         - include_role:
+            name: tunelo
+            tasks_from: loadbalancer
+          tags: tunelo
+          when: enable_tunelo | bool
+        - include_role:
             name: vitrage
             tasks_from: loadbalancer
           tags: vitrage
@@ -339,6 +357,16 @@
       when:
         - enable_haproxy | bool
         - kolla_action in ['deploy', 'reconfigure', 'upgrade', 'config']
+
+- name: Apply role letsencrypt
+  gather_facts: false
+  hosts:
+    - letsencrypt
+    - '&enable_letsencrypt_True'
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: letsencrypt,
+        tags: letsencrypt }
 
 - name: Apply role collectd
   gather_facts: false
@@ -398,6 +426,7 @@
   gather_facts: false
   hosts:
     - prometheus
+    - prometheus-pushgateway
     - prometheus-node-exporter
     - prometheus-mysqld-exporter
     - prometheus-haproxy-exporter
@@ -408,6 +437,7 @@
     - prometheus-elasticsearch-exporter
     - prometheus-blackbox-exporter
     - prometheus-libvirt-exporter
+    - prometheus-snmp-exporter
     - '&enable_prometheus_True'
   serial: '{{ kolla_serial|default("0") }}'
   roles:
@@ -966,3 +996,22 @@
   roles:
     - { role: skyline,
         tags: skyline }
+        
+- name: Apply role doni
+  gather_facts: false
+  hosts:
+    - doni-api
+    - doni-worker
+    - "&enable_doni_True"
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: doni, tags: doni, when: enable_doni | bool }
+
+- name: Apply role tunelo
+  gather_facts: false
+  hosts:
+    - tunelo-api
+    - "&enable_tunelo_True"
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: tunelo, tags: tunelo, when: enable_tunelo | bool }

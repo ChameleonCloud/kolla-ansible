@@ -66,6 +66,7 @@ LogLevel info
     OIDCClaimPrefix "OIDC-"
     OIDCClaimDelimiter ";"
     OIDCResponseType "{{ keystone_federation_oidc_response_type }}"
+    OIDCPassIDTokenAs claims payload
     OIDCScope "{{ keystone_federation_oidc_scopes }}"
     OIDCMetadataDir {{ keystone_container_federation_oidc_metadata_folder }}
 {% if keystone_federation_oidc_jwks_uri | length > 0 %}
@@ -76,6 +77,9 @@ LogLevel info
 {% endif %}
     OIDCCryptoPassphrase {{ keystone_federation_openid_crypto_password }}
     OIDCRedirectURI {{ keystone_public_url }}/redirect_uri
+{% if keystone_federation_oidc_allowed_redirects | length > 0 %}
+    OIDCRedirectURLsAllowed {{ keystone_federation_oidc_allowed_redirects | join(" ") }}
+{% endif %}
 {% if enable_memcached | bool and keystone_oidc_enable_memcached | bool %}
     OIDCCacheType memcache
     OIDCMemCacheServers "{% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %} {% endif %}{% endfor %}"
@@ -88,12 +92,17 @@ LogLevel info
 
     {# WebSSO authentication endpoint -#}
     <Location /v3/auth/OS-FEDERATION/websso/openid>
+{% set keystone_identity_providers_openid = keystone_identity_providers | selectattr('protocol','equalto','openid') | list %}
+{% if keystone_identity_providers_openid | count == 1 %}
+      {# Special case when there is only one IdP, default to it on this generic path -#}
+      OIDCDiscoverURL {{ keystone_public_url }}/redirect_uri?iss={{ keystone_identity_providers_openid[0].identifier | urlencode }}
+{% endif %}
       Require valid-user
       AuthType openid-connect
     </Location>
 
 {% for idp in keystone_identity_providers %}
-{% if idp.protocol == 'openid' %}
+    {% if idp.protocol == 'openid' %}
     <LocationMatch /v3/auth/OS-FEDERATION/identity_providers/{{ idp.name }}/protocols/{{ idp.protocol }}/websso>
       OIDCDiscoverURL {{ keystone_public_url }}/redirect_uri?iss={{ idp.identifier | urlencode }}
       Require valid-user
@@ -139,3 +148,4 @@ LogLevel info
 {% endif %}
 </VirtualHost>
 {% endif %}
+

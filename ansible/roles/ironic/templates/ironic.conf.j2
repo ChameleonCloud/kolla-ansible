@@ -27,6 +27,11 @@ topics = {{ ironic_enabled_notification_topics | map(attribute='name') | join(',
 driver = noop
 {% endif %}
 
+{% if enable_prometheus_ironic_exporter | bool %}
+driver = prometheus_exporter
+location = /opt/stack/node_metrics
+{% endif %}
+
 [oslo_messaging_rabbit]
 heartbeat_in_pthread = {{ service_name == 'ironic-api' }}
 {% if om_enable_rabbitmq_tls | bool %}
@@ -48,6 +53,9 @@ policy_file = {{ ironic_policy_file }}
 {% if service_name == 'ironic-conductor' %}
 [conductor]
 automated_clean=false
+{% if enable_prometheus_ironic_exporter | bool %}
+send_sensor_data = true
+{% endif %}
 {% endif %}
 
 [database]

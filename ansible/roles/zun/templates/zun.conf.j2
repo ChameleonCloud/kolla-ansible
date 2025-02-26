@@ -10,8 +10,15 @@ log_dir = /var/log/kolla/zun
 transport_url = {{ rpc_transport_url }}
 
 state_path = /var/lib/zun
+
+{% if service_name == 'zun-compute-k8s' %}
+container_driver = k8s
+capsule_driver = k8s
+host = {{ ansible_facts.hostname }}-k8s
+{% else %}
 container_driver = docker
 capsule_driver = cri
+{% endif %}
 
 [network]
 driver = kuryr
@@ -92,6 +99,11 @@ region_name = {{ openstack_region_name }}
 endpoint_type = internalURL
 ca_file = {{ openstack_cacert }}
 
+[cyborg_client]
+region_name = {{ openstack_region_name }}
+endpoint_type = internalURL
+ca_file = {{ openstack_cacert }}
+
 {% if enable_osprofiler | bool %}
 [profiler]
 enabled = true
@@ -123,6 +135,11 @@ docker_remote_api_port = 2375
 
 [cni_daemon]
 cni_daemon_port = {{ zun_cni_daemon_port }}
+
+{% if service_name == 'zun-compute-k8s' %}
+[k8s]
+kubeconfig_file = /etc/zun/kubeconfig.yml
+{% endif %}
 
 [oslo_messaging_rabbit]
 heartbeat_in_pthread = {{ service_name == 'zun-api' }}

@@ -246,6 +246,17 @@ keystone_should_remove_attribute_mappings: False
 keystone_should_remove_identity_providers: False
 keystone_federation_oidc_response_type: "id_token"
 keystone_federation_oidc_scopes: "openid email profile"
+keystone_federation_oidc_allowed_redirects: []
 
 # OIDC caching
 keystone_oidc_enable_memcached: "{{ enable_memcached }}"
+
+####################
+# WSGI
+####################
+keystone_wsgi_public_vhost_config: |
+  {{'#'}} Custom vhost configuration can be added here via
+  {{'#'}} the `keystone_wsgi_public_vhost_config` variable.
+keystone_wsgi_admin_vhost_config: |
+  {{'#'}} Custom vhost configuration can be added here via
+  {{'#'}} the `keystone_wsgi_admin_vhost_config` variable.

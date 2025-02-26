@@ -144,6 +144,7 @@
     - service.enabled | bool
     - not enable_ironic_pxe_uefi | bool
     - not ironic_dnsmasq_serve_ipxe | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-tftp container
 
@@ -184,6 +185,7 @@
     - service.enabled | bool
     - not enable_ironic_pxe_uefi | bool
     - not ironic_dnsmasq_serve_ipxe | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-tftp container
 
@@ -203,6 +205,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-http container
 
@@ -223,6 +226,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - ironic_inspector_standalone | bool
   notify:
     - Restart ironic-http container
 

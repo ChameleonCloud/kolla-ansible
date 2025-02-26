@@ -116,6 +116,10 @@ function find_base_dir {
             if test -f ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla-ansible.egg-link; then
                 # Editable install.
                 BASEDIR="$(head -n1 ${VIRTUAL_ENV}/lib/${python_dir}/*-packages/kolla-ansible.egg-link)"
+            elif test -f ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla_ansible*.dist-info/direct_url.json; then
+                # Editable install in local path
+                direct_url="$(yq eval '.url' ${VIRTUAL_ENV}/lib/${python_dir}/site-packages/kolla_ansible*.dist-info/direct_url.json)"
+                BASEDIR="${direct_url#file:\/\/}"
             else
                 BASEDIR="${VIRTUAL_ENV}/share/kolla-ansible"
             fi

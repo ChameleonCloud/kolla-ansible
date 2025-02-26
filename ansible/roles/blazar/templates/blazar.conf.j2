@@ -17,7 +17,7 @@ cafile = {{ openstack_cacert }}
 api_v2_controllers = oshosts,leases
 
 [manager]
-plugins = virtual.instance.plugin,physical.host.plugin
+plugins = {% for plugin in blazar_enabled_plugins %}{{ plugin.name }}.plugin,{% endfor %}
 
 [keystone_authtoken]
 service_type = reservation
@@ -46,6 +46,16 @@ max_retries = -1
 [nova]
 aggregate_freepool_name = {{ blazar_aggregate_pool_name }}
 
+{% if blazar_enabled_device_plugins | count > 0 %}
+[device]
+plugins = {% for plugin in blazar_enabled_device_plugins %}{{ plugin.name }}.plugin,{% endfor %}
+{% endif %}
+
+{% if blazar_enable_device_plugin_k8s | bool %}
+[k8s]
+kubeconfig_file = /etc/blazar/kubeconfig.yml
+{% endif %}
+
 [oslo_messaging_notifications]
 {% if blazar_enabled_notification_topics %}
 driver = messagingv2
@@ -70,4 +80,14 @@ rabbit_quorum_queue = true
 {% if blazar_policy_file is defined %}
 [oslo_policy]
 policy_file = {{ blazar_policy_file }}
+{% endif %}
+
+{% if blazar_enabled_network_plugins | count > 0 %}
+[network]
+usage_type_plugins = {% for plugin in blazar_enabled_network_plugins %}{{ plugin.name }}.plugin,{% endfor %}
+{% endif %}
+
+{% if blazar_enable_network_plugin_storage %}
+[network_storage]
+ceph_nfs_share_type = {{ default_share_type }}
 {% endif %}

@@ -261,6 +261,19 @@ workaround_ansible_issue_8743: yes
 # Please read the docs for more details.
 #acme_client_servers: []
 
+####################
+# LetsEncrypt options
+####################
+# This option is required for letsencrypt role to work properly.
+#letsencrypt_email: ""
+
+####################
+# LetsEncrypt certificate server options
+####################
+#letsencrypt_cert_server: "https://acme-v02.api.letsencrypt.org/directory"
+# attempt to renew Let's Encrypt certificate every 12 hours
+#letsencrypt_cron_renew_schedule:  "0   */12   *   *   *"
+
 ################
 # Region options
 ################
@@ -321,6 +334,7 @@ workaround_ansible_issue_8743: yes
 #enable_cyborg: "no"
 #enable_designate: "no"
 #enable_destroy_images: "no"
+#enable_doni: "no"
 #enable_etcd: "no"
 #enable_fluentd: "yes"
 #enable_freezer: "no"
@@ -724,6 +738,9 @@ workaround_ansible_issue_8743: yes
 #enable_prometheus_libvirt_exporter: "{{ enable_prometheus | bool and enable_nova | bool and nova_compute_virt_type in ['kvm', 'qemu'] }}"
 #enable_prometheus_etcd_integration: "{{ enable_prometheus | bool and enable_etcd | bool }}"
 #enable_prometheus_msteams: "no"
+#enable_prometheus_snmp_exporter: "{{ enable_prometheus | bool }}"
+#enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
+#enable_prometheus_ironic_exporter: "{{ enable_prometheus | bool and enable ironic | bool }}"
 
 # The labels to add to any time series or alerts when communicating with external systems (federation, remote storage, Alertmanager).
 # prometheus_external_labels:

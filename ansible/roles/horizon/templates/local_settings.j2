@@ -2,7 +2,7 @@
 
 import os
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openstack_dashboard import exceptions
 from openstack_dashboard.settings import HORIZON_CONFIG
@@ -28,6 +28,11 @@ WEBROOT = '/'
 # For more information see:
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['*']
+
+# Template directories defined here will be added to DIRS option of Django
+# TEMPLATES setting. It is useful when you would like to load
+# deployment-specific templates.`
+ADD_TEMPLATE_DIRS = ['/etc/openstack-dashboard/templates']
 
 {% if horizon_backend_database | bool %}
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -178,7 +183,7 @@ SECRET_KEY='{{ horizon_secret_key }}'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'LOCATION': [{% for host in groups['memcached'] %}'{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}'{% if not loop.last %},{% endif %}{% endfor %}]
     }
 }
@@ -206,8 +211,16 @@ AVAILABLE_REGIONS = [
 
 OPENSTACK_HOST = "{{ kolla_internal_fqdn }}"
 
+{% if custom_openrc %}
+OPENRC_CUSTOM_TEMPLATE = "openrc.sh.template"
+{% endif %}
+{% if custom_clouds_yaml %}
+OPENSTACK_CLOUDS_YAML_CUSTOM_TEMPLATE = "clouds.yaml.template"
+{% endif %}
+
 # TODO(fprzewozn): URL /v3 suffix is required until Horizon bug #2073639 is resolved
 OPENSTACK_KEYSTONE_URL = "{{ horizon_keystone_url }}/v3"
+
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "{{ keystone_default_user_role }}"
 
 {% if enable_keystone_federation | bool %}
