@@ -218,7 +218,8 @@ OPENRC_CUSTOM_TEMPLATE = "openrc.sh.template"
 OPENSTACK_CLOUDS_YAML_CUSTOM_TEMPLATE = "clouds.yaml.template"
 {% endif %}
 
-OPENSTACK_KEYSTONE_URL = "{{ horizon_keystone_url }}"
+# TODO(fprzewozn): URL /v3 suffix is required until Horizon bug #2073639 is resolved
+OPENSTACK_KEYSTONE_URL = "{{ horizon_keystone_url }}/v3"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "{{ keystone_default_user_role }}"
 
 {% if enable_keystone_federation | bool %}
