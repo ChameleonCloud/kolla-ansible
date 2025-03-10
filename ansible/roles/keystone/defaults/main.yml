@@ -228,6 +228,8 @@ keystone_host_federation_oidc_attribute_mappings_folder: "{{ node_config_directo
 keystone_federation_oidc_jwks_uri: ""
 keystone_federation_oidc_additional_options: {}
 
+keystone_federation_oidc_metadata_url: ""
+
 # These variables are used to define multiple trusted Horizon dashboards.
 # keystone_trusted_dashboards: ['<https://dashboardServerOne/auth/websso/>', '<https://dashboardServerTwo/auth/websso/>', '<https://dashboardServerN/auth/websso/>']
 horizon_trusted_dashboards: "{{ ['%s://%s/auth/websso/' % (public_protocol, kolla_external_fqdn), '%s/auth/websso/' % (horizon_public_endpoint)] if enable_horizon | bool else [] }}"

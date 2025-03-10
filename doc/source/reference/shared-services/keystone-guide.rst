@@ -104,6 +104,21 @@ Example for Keycloak shown below:
     keystone_federation_oidc_additional_options:
       OIDCTokenBindingPolicy: disabled
 
+IDPs allow fetching configuration from a `/.well-known/openid-configuration`
+endpoint: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+
+When using only a single IDP, setting `keystone_federation_oidc_metadata_url`
+configures mod_auth_openidc to fetch this configuration instead of from a
+manually populated `metadata_folder`.
+If using auth-openidc, `keystone_federation_oidc_jwks_uri` must also be set,
+since mod_auth_openidc does not use the discovered jwks_uri for it.
+
+Example configuration:
+
+.. code-block:: yaml
+
+    keystone_federation_oidc_metadata_url: "{{ keystone_identity_providers[0].identifier }}/.well-known/openid-configuration"
+
 Identity providers configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -145,7 +160,7 @@ metadata_folder
 ***************
 
 Path to the folder containing all of the identity provider metadata as JSON
-files.
+files. Needed if `keystone_federation_oidc_metadata_url` is not set.
 
 The metadata folder must have all your Identity Providers configurations,
 the name of the files will be the name (with path) of the Issuer configuration.
