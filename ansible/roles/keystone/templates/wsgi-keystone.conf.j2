@@ -67,7 +67,13 @@ LogLevel info
     OIDCClaimDelimiter ";"
     OIDCResponseType "{{ keystone_federation_oidc_response_type }}"
     OIDCScope "{{ keystone_federation_oidc_scopes }}"
+{% if keystone_oidc_provider_metadata_url is defined %}
+    OIDCProviderMetadataURL "{{ keystone_oidc_provider_metadata_url }}"
+    OIDCClientID "{{ keystone_oidc_client_id }}"
+    OIDCClientSecret "{{ keystone_oidc_client_secret }}"
+{% else %}
     OIDCMetadataDir {{ keystone_container_federation_oidc_metadata_folder }}
+{% endif %}
 {% if keystone_federation_oidc_jwks_uri | length > 0 %}
     OIDCOAuthVerifyJwksUri {{ keystone_federation_oidc_jwks_uri }}
 {% endif %}
