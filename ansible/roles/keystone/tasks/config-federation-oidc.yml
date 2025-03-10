@@ -40,7 +40,8 @@
     - "{{ keystone_identity_providers }}"
     - ["provider", "client", "conf"]
   when:
-    - item.0.protocol == 'openid'
+    - item.protocol == 'openid'
+    - item.metadata_folder is defined
     - inventory_hostname in groups[keystone.group]
 
 - name: Copying OpenID Identity Providers certificate
