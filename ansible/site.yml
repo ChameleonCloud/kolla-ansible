@@ -1034,6 +1034,7 @@
     - zun-api
     - zun-wsproxy
     - zun-compute
+    - zun-compute-k8s
     - zun-cni-daemon
     - "&enable_zun_True"
   serial: '{{ kolla_serial|default("0") }}'
