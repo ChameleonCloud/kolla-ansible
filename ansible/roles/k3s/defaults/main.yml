@@ -30,7 +30,7 @@ k3s_services:
 ####################
 # Docker
 ####################
-
+k3s_install_type: "{{ kolla_install_type }}"
 k3s_tag: "{{ openstack_tag }}"
 k3s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ k3s_install_type }}-k3s"
 k3s_image_full: "{{ k3s_image }}:{{ k3s_tag }}"
