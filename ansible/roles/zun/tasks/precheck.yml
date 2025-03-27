@@ -58,3 +58,4 @@
   run_once: true
   when:
     - enable_zun | bool
+    - not enable_zun_compute_k8s | bool
