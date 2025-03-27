@@ -159,6 +159,8 @@ fluentd_input_openstack_services:
     enabled: "{{ enable_ironic | bool }}"
   - name: ironic-inspector
     enabled: "{{ enable_ironic | bool }}"
+  - name: k3s
+    enabled: "{{ enable_k3s | bool }}"
   - name: keystone
     enabled: "{{ enable_keystone | bool }}"
   - name: kuryr

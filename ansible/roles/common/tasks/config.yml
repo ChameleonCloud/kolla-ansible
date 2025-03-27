@@ -207,6 +207,7 @@
       - { name: "ironic", enabled: "{{ enable_ironic | bool }}" }
       - { name: "ironic-inspector", enabled: "{{ enable_ironic | bool }}" }
       - { name: "iscsid", enabled: "{{ enable_iscsid | bool }}" }
+      - { name: "k3s", enabled: "{{ enable_k3s | bool }}" }
       - { name: "kafka", enabled: "{{ enable_kafka | bool }}" }
       - { name: "keepalived", enabled: "{{ enable_haproxy | bool }}" }
       - { name: "keystone", enabled: "{{ enable_keystone | bool }}" }

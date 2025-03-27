@@ -1,0 +1,45 @@
+---
+k3s_services:
+  k3s:
+    container_name: k3s
+    group: k3s
+    enabled: true
+    image: "{{ k3s_image_full }}"
+    volumes: "{{ k3s_default_volumes + k3s_extra_volumes }}"
+    dimensions: "{{ k3s_dimensions }}"
+    haproxy:
+      k3s:
+        enabled: "{{ enable_k3s }}"
+        mode: "http"
+        external: false
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_listen_port }}"
+      k3s_external:
+        enabled: "{{ enable_k3s }}"
+        mode: "http"
+        external: true
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_listen_port }}"
+
+####################
+# Database
+####################
+
+# nope!!
+
+####################
+# Docker
+####################
+
+k3s_tag: "{{ openstack_tag }}"
+k3s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ k3s_install_type }}-k3s"
+k3s_image_full: "{{ k3s_image }}:{{ k3s_tag }}"
+k3s_dimensions: "{{ default_container_dimensions }}"
+
+k3s_default_volumes:
+  - "{{ node_config_directory }}/k3s/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla"
+
+k3s_extra_volumes: "{{ default_extra_volumes }}"

@@ -761,6 +761,9 @@ ovn-database
 [ovn-sb-db:children]
 ovn-database
 
+[k3s:children]
+control
+
 [doni:children]
 control
 
