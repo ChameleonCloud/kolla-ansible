@@ -55,4 +55,5 @@
   changed_when: false
   when:
     - enable_zun | bool
+    - not enable_zun_compute_k8s | bool
     - not enable_kuryr | bool
