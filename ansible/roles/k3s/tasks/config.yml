@@ -25,15 +25,11 @@
   notify:
     - "Restart {{ item.key }} container"
 
-- name: Copying over k3s.yaml
+- name: Templating k3s.yaml
   vars:
     service_name: "{{ item.key }}"
-  merge_configs:
-    sources:
-      - "{{ role_path }}/templates/k3s.yaml.j2"
-      - "{{ node_custom_config }}/k3s.yaml"
-      - "{{ node_custom_config }}/k3s/k3s.yaml"
-      - "{{ node_custom_config }}/k3s/{{ inventory_hostname }}/k3s.yaml"
+  copy:
+    content: "{{ k3s_config | to_yaml(indent=4) }}"
     dest: "{{ node_config_directory }}/{{ item.key }}/k3s.yaml"
     mode: "0660"
   become: true

@@ -1,0 +1,49 @@
+---
+- name: wait for k3s to start
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl wait --for=jsonpath='.metadata.annotations.k3s\.io/internal-ip' node {{ ansible_facts['nodename'] }}
+  retries: 10
+  delay: 5
+  register: result
+  until: result.rc == 0
+  delegate_to: "{{ groups['k3s'][0] }}"
+
+
+# runs on first k3s server host
+# exec and extract kubeconfig to variable
+- name: get kubeconfig from k3s
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl config view --raw
+  register: kubeconfig_remote
+  delegate_to: "{{ groups['k3s'][0] }}"
+  changed_when: false
+
+- name: Creating kubeconfig file on the deploy node
+  become: true
+  vars:
+    local_kubeconfig: "{{ hostvars[groups['k3s'][0]]['kubeconfig_remote']['stdout'] }}"
+  copy:
+    content: "{{ local_kubeconfig }}"
+    dest: "{{ node_config }}/kubeconfig.yml"
+    owner: "{{ ansible_facts.user_uid }}"
+    group: "{{ ansible_facts.user_gid }}"
+    mode: 0600
+  delegate_to: "{{ groups['deployment'][0] }}"
+
+- name: applying calico config
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ node_config }}/node_custom_config/k3s/tigera-operator.yaml"
+    kubeconfig: "{{ node_config }}/kubeconfig.yml"
+  delegate_to: "{{ groups['deployment'][0] }}"
+
+- name: applying calico custom resources
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ node_config }}/node_custom_config/k3s/custom-resources.yaml"
+    kubeconfig: "{{ node_config }}/kubeconfig.yml"
+  delegate_to: "{{ groups['deployment'][0] }}"

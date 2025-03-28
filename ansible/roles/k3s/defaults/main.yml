@@ -6,26 +6,23 @@ k3s_services:
     enabled: true
     image: "{{ k3s_image_full }}"
     volumes: "{{ k3s_default_volumes + k3s_extra_volumes }}"
+    command: "server --config /var/lib/kolla/config_files/k3s.yaml"
     dimensions: "{{ k3s_dimensions }}"
+    privileged: true
     haproxy:
       k3s:
         enabled: "{{ enable_k3s }}"
-        mode: "http"
+        mode: "tcp"
         external: false
         port: "{{ k3s_port }}"
         listen_port: "{{ k3s_listen_port }}"
       k3s_external:
         enabled: "{{ enable_k3s }}"
-        mode: "http"
+        mode: "tcp"
         external: true
         port: "{{ k3s_port }}"
         listen_port: "{{ k3s_listen_port }}"
 
-####################
-# Database
-####################
-
-# nope!!
 
 ####################
 # Docker
@@ -39,7 +36,24 @@ k3s_dimensions: "{{ default_container_dimensions }}"
 k3s_default_volumes:
   - "{{ node_config_directory }}/k3s/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
+  - "/etc/machine-id:/etc/machine-id:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
+  - "k3s_server:/var/lib/rancher/k3s"
 
 k3s_extra_volumes: "{{ default_extra_volumes }}"
+
+# entries in this dict get templated into k3s.yaml
+# https://docs.k3s.io/installation/configuration#configuration-file
+k3s_config:
+  write-kubeconfig-mode: "0644"
+  cluster-init: true
+  tls-san: "{{ kolla_internal_vip_address }}"
+  token: "{{ k3s_token }}"
+  cluster-cidr: "192.168.0.0/16"
+  flannel-backend: "none"
+  disable-network-policy: true
+  bind-address: "{{ api_interface_address }}"
+  node-ip: "{{ api_interface_address }}"
+  disable:
+    - traefik
