@@ -34,16 +34,20 @@
     mode: 0600
   delegate_to: "{{ groups['deployment'][0] }}"
 
+# TODO
+# needs kubernetes+openshift present in kolla venv
+# better way is probably just running docker run kubectl apply 
+
 - name: applying calico config
   kubernetes.core.k8s:
     state: present
-    src: "{{ node_config }}/node_custom_config/k3s/tigera-operator.yaml"
+    src: "files/tigera-operator.yaml"
     kubeconfig: "{{ node_config }}/kubeconfig.yml"
   delegate_to: "{{ groups['deployment'][0] }}"
 
 - name: applying calico custom resources
   kubernetes.core.k8s:
     state: present
-    src: "{{ node_config }}/node_custom_config/k3s/custom-resources.yaml"
+    src: "templates/custom-resources.yaml"
     kubeconfig: "{{ node_config }}/kubeconfig.yml"
   delegate_to: "{{ groups['deployment'][0] }}"
