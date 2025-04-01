@@ -2,11 +2,11 @@
     "command": "k3s server",
     "config_files": [
         {
-            "source": "{{ container_config_directory }}/config.yaml",
+            "source": "{{ container_config_directory }}/k3s_config.yaml",
             "dest": "/etc/rancher/k3s/config.yaml",
             "owner": "k3s",
             "perm": "0600"
-        },
+        }
     ],
     "permissions": [
         {

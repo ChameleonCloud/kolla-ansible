@@ -6,7 +6,6 @@ k3s_services:
     enabled: true
     image: "{{ k3s_image_full }}"
     volumes: "{{ k3s_default_volumes + k3s_extra_volumes }}"
-    command: "server --config /var/lib/kolla/config_files/k3s.yaml"
     dimensions: "{{ k3s_dimensions }}"
     privileged: true
     haproxy:
@@ -46,14 +45,16 @@ k3s_extra_volumes: "{{ default_extra_volumes }}"
 # entries in this dict get templated into k3s.yaml
 # https://docs.k3s.io/installation/configuration#configuration-file
 k3s_config:
-  write-kubeconfig-mode: "0644"
-  cluster-init: true
+  log: /var/log/kolla/k3s/k3s.log
   tls-san: "{{ kolla_internal_vip_address }}"
-  token: "{{ k3s_token }}"
-  cluster-cidr: "192.168.0.0/16"
-  flannel-backend: "none"
-  disable-network-policy: true
   bind-address: "{{ api_interface_address }}"
   node-ip: "{{ api_interface_address }}"
+  token: "{{ k3s_token }}"
+  write-kubeconfig-mode: "0644"
+  write-kubeconfig: "/root/.kube/config"  
+  cluster-cidr: "192.168.0.0/16"
+  cluster-init: true
+  flannel-backend: "none"
+  disable-network-policy: true
   disable:
     - traefik

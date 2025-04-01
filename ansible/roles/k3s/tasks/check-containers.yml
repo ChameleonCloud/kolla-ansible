@@ -9,7 +9,6 @@
     cap_add: "{{ item.value.cap_add|default([]) }}"
     volumes: "{{ item.value.volumes|reject('equalto', '')|list }}"
     dimensions: "{{ item.value.dimensions }}"
-    command: "{{ item.value.command }}"
     privileged: "{{ item.value.privileged | default(False) }}"
   when:
     - inventory_hostname in groups[item.value.group]

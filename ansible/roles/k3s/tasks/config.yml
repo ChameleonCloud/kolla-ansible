@@ -25,12 +25,12 @@
   notify:
     - "Restart {{ item.key }} container"
 
-- name: Templating k3s.yaml
+- name: Templating k3s_config.yaml
   vars:
     service_name: "{{ item.key }}"
   copy:
     content: "{{ k3s_config | to_yaml(indent=4) }}"
-    dest: "{{ node_config_directory }}/{{ item.key }}/k3s.yaml"
+    dest: "{{ node_config_directory }}/{{ item.key }}/k3s_config.yaml"
     mode: "0660"
   become: true
   when:
