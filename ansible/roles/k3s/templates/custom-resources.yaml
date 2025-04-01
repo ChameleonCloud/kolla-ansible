@@ -9,8 +9,12 @@ spec:
   calicoNetwork:
     ipPools:
     - name: default-ipv4-ippool
+      allowedUses:
+        - Workload
+        - Tunnel
       blockSize: 26
       cidr: 192.168.0.0/16
+      disableNewAllocations: false
       encapsulation: VXLANCrossSubnet
       natOutgoing: Enabled
       nodeSelector: all()
