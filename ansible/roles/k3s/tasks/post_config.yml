@@ -8,6 +8,7 @@
   delay: 5
   register: result
   until: result.rc == 0
+  run_once: true
   delegate_to: "{{ groups['k3s'][0] }}"
 
 
@@ -19,6 +20,7 @@
     docker exec {{ k3s_services['k3s'].container_name }}
     kubectl config view --raw
   register: kubeconfig_remote
+  run_once: true
   delegate_to: "{{ groups['k3s'][0] }}"
   changed_when: false
 
@@ -32,6 +34,7 @@
     owner: "{{ ansible_facts.user_uid }}"
     group: "{{ ansible_facts.user_gid }}"
     mode: 0600
+  run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
 
 # TODO
@@ -43,6 +46,7 @@
     state: present
     src: "files/tigera-operator.yaml"
     kubeconfig: "{{ node_config }}/kubeconfig.yml"
+  run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
 
 - name: applying calico custom resources
@@ -50,4 +54,5 @@
     state: present
     src: "templates/custom-resources.yaml"
     kubeconfig: "{{ node_config }}/kubeconfig.yml"
+  run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
