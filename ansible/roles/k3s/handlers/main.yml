@@ -11,7 +11,6 @@
     image: "{{ service.image }}"
     cap_add: "{{ service.cap_add|default([]) }}"
     volumes: "{{ service.volumes|reject('equalto', '')|list }}"
-    dimensions: "{{ service.dimensions }}"
     privileged: "{{ service.privileged | default(False) }}"
   when:
     - kolla_action != "config"
