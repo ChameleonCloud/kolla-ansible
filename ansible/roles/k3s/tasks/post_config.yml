@@ -30,7 +30,7 @@
     local_kubeconfig: "{{ hostvars[groups['k3s'][0]]['kubeconfig_remote']['stdout'] }}"
   copy:
     content: "{{ local_kubeconfig }}"
-    dest: "{{ node_config }}/kubeconfig.yml"
+    dest: "{{ node_custom_config }}/kubeconfig.yml"
     owner: "{{ ansible_facts.user_uid }}"
     group: "{{ ansible_facts.user_gid }}"
     mode: 0600
@@ -45,7 +45,7 @@
   kubernetes.core.k8s:
     state: present
     src: "files/tigera-operator.yaml"
-    kubeconfig: "{{ node_config }}/kubeconfig.yml"
+    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
 
@@ -53,6 +53,6 @@
   kubernetes.core.k8s:
     state: present
     src: "templates/custom-resources.yaml"
-    kubeconfig: "{{ node_config }}/kubeconfig.yml"
+    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"

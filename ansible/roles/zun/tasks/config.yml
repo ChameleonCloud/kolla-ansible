@@ -73,24 +73,35 @@
   notify:
     - Restart {{ item.key }} container
 
-# allow this task to fail, as this will run before a kubeconfig file is available, then must be rerun
-- name: Copying over kubeconfig for k8s agent
+- name: Check if kubeconfig exists for zun-compute-k8s
+  vars:
+    service_name: zun-compute-k8s
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: zun_kubeconfig
+  with_first_found:
+    - files:
+        - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
+        - "{{ node_custom_config }}/zun/kubeconfig.yml"
+        - "{{ node_custom_config }}/kubeconfig.yml"
+        - "kubeconfig.yml.j2"
+  when:
+    - enable_zun_compute_k8s | bool
+
+- name: Copying over kubeconfig for zun k8s compute agent
   vars:
     service_name: zun-compute-k8s
   copy:
-    src: "{{ item }}"
+    src: "{{ zun_kubeconfig.results.0.stat.path }}"
     dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
     mode: "0600"
-  with_first_found:
-    - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
-    - "{{ node_custom_config }}/zun/kubeconfig.yml"
-    - "{{ node_custom_config }}/kubeconfig.yml"
-    - "kubeconfig.yml.j2"
   become: true
-  ignore_errors: true
   when:
+    - zun_kubeconfig.results
     - zun_services[service_name].enabled | bool
     - inventory_hostname in groups[zun_services[service_name].group]
+  notify:
+    - Restart {{ service_name }} container
 
 - name: Copying over wsgi-zun files for services
   vars:

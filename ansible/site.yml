@@ -1008,6 +1008,15 @@
   serial: '{{ kolla_serial|default("0") }}'
   roles:
     - { role: octavia, tags: octavia, when: enable_octavia | bool }
+        
+- name: Apply role k3s
+  gather_facts: false
+  hosts:
+    - k3s
+    - "&enable_k3s_True"
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: k3s, tags: k3s, when: enable_k3s | bool }
 
 - name: Apply role zun
   gather_facts: false
@@ -1074,15 +1083,6 @@
   serial: '{{ kolla_serial|default("0") }}'
   roles:
     - { role: letsencrypt, tags: letsencrypt, when: enable_letsencrypt | bool }
-
-- name: Apply role k3s
-  gather_facts: false
-  hosts:
-    - k3s
-    - "&enable_k3s_True"
-  serial: '{{ kolla_serial|default("0") }}'
-  roles:
-    - { role: k3s, tags: k3s, when: enable_k3s | bool }
 
 - name: Apply role doni
   gather_facts: false
