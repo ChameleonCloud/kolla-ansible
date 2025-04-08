@@ -51,8 +51,11 @@ k3s_config:
   write-kubeconfig-mode: "0644"
   write-kubeconfig: "/root/.kube/config"  
   cluster-cidr: "192.168.0.0/16"
-  cluster-init: true
   flannel-backend: "none"
   disable-network-policy: true
+  cluster-init: true
   disable:
     - traefik
+
+k3s_extra_config:
+  server: "https://{{ kolla_internal_vip_address }}:6443"

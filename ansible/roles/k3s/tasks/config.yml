@@ -25,17 +25,37 @@
   notify:
     - "Restart {{ item.key }} container"
 
-- name: Templating k3s_config.yaml
+- name: Templating k3s_config.yaml to first node
   vars:
     service_name: "{{ item.key }}"
+    k3s_node_config: "{{ k3s_config }}"
   copy:
-    content: "{{ k3s_config | to_yaml(indent=4) }}"
+    content: "{{ k3s_node_config | to_yaml(indent=4) }}"
     dest: "{{ node_config_directory }}/{{ item.key }}/k3s_config.yaml"
     mode: "0660"
   become: true
   when:
     - item.key in [ "k3s" ]
     - inventory_hostname in groups[item.value.group]
+    - inventory_hostname == groups[item.value.group][0]
+    - item.value.enabled | bool
+  with_dict: "{{ k3s_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Templating k3s_config.yaml
+  vars:
+    service_name: "{{ item.key }}"
+    k3s_node_config: "{{ k3s_config | combine(k3s_extra_config) }}"
+  copy:
+    content: "{{ k3s_node_config | to_yaml(indent=4) }}"
+    dest: "{{ node_config_directory }}/{{ item.key }}/k3s_config.yaml"
+    mode: "0660"
+  become: true
+  when:
+    - item.key in [ "k3s" ]
+    - inventory_hostname in groups[item.value.group]
+    - inventory_hostname != groups[item.value.group][0]
     - item.value.enabled | bool
   with_dict: "{{ k3s_services }}"
   notify:
