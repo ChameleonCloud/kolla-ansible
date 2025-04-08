@@ -13,7 +13,9 @@ state_path = /var/lib/zun
 
 {% if service_name == 'zun-compute-k8s' %}
 container_driver = k8s
-capsule_driver = k8s
+
+# capsule driver is not implemented for k8s
+capsule_driver = fake
 host = {{ ansible_facts.hostname }}-k8s
 {% else %}
 container_driver = docker
