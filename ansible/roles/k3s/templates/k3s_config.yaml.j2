@@ -1,0 +1,43 @@
+---
+################
+# cluster-config
+################
+
+cluster-cidr: "{{ k3s_cluster_cidr }}"
+
+# advertise haproxy internal VIP as fixed registration address
+tls-san: "{{ kolla_internal_vip_address }}"
+
+###################
+# per-server config
+###################
+# use the token from passwords.yml to join servers
+token: "{{ k3s_token }}"
+
+# log path inside the k3s kolla container
+log: /var/log/kolla/k3s/k3s.log
+# write kubeconfig inside container so that docker exec kubectl works
+write-kubeconfig-mode: "0644"
+write-kubeconfig: "/root/.kube/config"
+
+# bind to internal API address
+bind-address: "{{ api_interface_address }}"
+node-ip: "{{ api_interface_address }}"
+
+{% if k3s_enable_calico | bool %}
+# extra config for calico
+flannel-backend: "none"
+disable-network-policy: true
+disable:
+    - traefik
+{% endif %}
+
+######################
+# Server bootstrapping
+######################
+{% if k3s_bootstrap | bool %}
+# set this when bootstrapping first node
+cluster-init: true
+{% else %}
+server: "{{ k3s_registration_address }}"
+{% endif %}
