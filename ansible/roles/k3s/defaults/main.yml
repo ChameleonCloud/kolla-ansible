@@ -54,9 +54,9 @@ k3s_enable_calico: true
   flannel-backend: "none"
   disable-network-policy: true
   cluster-init: true
-  disable:
-    - traefik
-
-k3s_extra_config:
-  server: "https://{{ kolla_internal_vip_address }}:6443"
+########################
+# Nvidia Runtime config
+########################
+k3s_nvidia_device_plugin_version: "v0.14.1"
+k3s_nvidia_device_plugin_image_full: "nvcr.io/nvidia/k8s-device-plugin:{{ k3s_nvidia_device_plugin_version }}"
  

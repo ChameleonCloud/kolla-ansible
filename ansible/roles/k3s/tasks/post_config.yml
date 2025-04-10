@@ -57,3 +57,11 @@
     kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
+
+- name: applying nvidia device plugin
+  kubernetes.core.k8s:
+    state: present
+    src: "templates/nvidia-device-plugin.yaml.j2"
+    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+  run_once: true
+  delegate_to: "{{ groups['deployment'][0] }}"
