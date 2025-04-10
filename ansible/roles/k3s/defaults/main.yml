@@ -40,13 +40,13 @@ k3s_default_volumes:
 
 k3s_extra_volumes: "{{ default_extra_volumes }}"
 
-# entries in this dict get templated into k3s.yaml
-# https://docs.k3s.io/installation/configuration#configuration-file
-k3s_config:
-  log: /var/log/kolla/k3s/k3s.log
-  tls-san: "{{ kolla_internal_vip_address }}"
-  bind-address: "{{ api_interface_address }}"
-  node-ip: "{{ api_interface_address }}"
+k3s_cluster_cidr: "192.168.0.0/16"
+k3s_registration_address: "https://{{ kolla_internal_vip_address }}:{{ k3s_port }}"
+# task sets this to true iff running on first server in cluster
+k3s_bootstrap: false
+
+k3s_enable_calico: true
+
   token: "{{ k3s_token }}"
   write-kubeconfig-mode: "0644"
   write-kubeconfig: "/root/.kube/config"  
@@ -59,3 +59,4 @@ k3s_config:
 
 k3s_extra_config:
   server: "https://{{ kolla_internal_vip_address }}:6443"
+ 

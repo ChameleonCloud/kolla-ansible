@@ -10,6 +10,7 @@
   until: result.rc == 0
   run_once: true
   delegate_to: "{{ groups['k3s'][0] }}"
+  changed_when: false
 
 
 # runs on first k3s server host
@@ -52,7 +53,7 @@
 - name: applying calico custom resources
   kubernetes.core.k8s:
     state: present
-    src: "templates/custom-resources.yaml"
+    src: "templates/calico-custom-resources.yaml.j2"
     kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
