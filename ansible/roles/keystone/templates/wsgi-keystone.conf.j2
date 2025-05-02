@@ -63,6 +63,7 @@ LogLevel info
     OIDCClaimDelimiter ";"
     OIDCResponseType "{{ keystone_federation_oidc_response_type }}"
     OIDCScope "{{ keystone_federation_oidc_scopes }}"
+    OIDCCookieSameSite "{{ keystone_oidc_cookie_samesite }}"
 {% if keystone_oidc_provider_metadata_url is defined %}
     OIDCProviderMetadataURL "{{ keystone_oidc_provider_metadata_url }}"
     OIDCClientID "{{ keystone_oidc_client_id }}"
