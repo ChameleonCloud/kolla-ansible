@@ -47,13 +47,6 @@ k3s_bootstrap: false
 
 k3s_enable_calico: true
 
-  token: "{{ k3s_token }}"
-  write-kubeconfig-mode: "0644"
-  write-kubeconfig: "/root/.kube/config"  
-  cluster-cidr: "192.168.0.0/16"
-  flannel-backend: "none"
-  disable-network-policy: true
-  cluster-init: true
 ########################
 # Nvidia Runtime config
 ########################
