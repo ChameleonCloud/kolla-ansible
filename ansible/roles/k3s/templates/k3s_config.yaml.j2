@@ -5,8 +5,6 @@
 
 cluster-cidr: "{{ k3s_cluster_cidr }}"
 
-# advertise haproxy internal VIP as fixed registration address
-tls-san: "{{ kolla_internal_vip_address }}"
 
 ###################
 # per-server config
