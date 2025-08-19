@@ -12,7 +12,6 @@
   delegate_to: "{{ groups['k3s'][0] }}"
   changed_when: false
 
-
 # runs on first k3s server host
 # exec and extract kubeconfig to variable
 - name: get kubeconfig from k3s
@@ -24,44 +23,53 @@
   run_once: true
   delegate_to: "{{ groups['k3s'][0] }}"
   changed_when: false
+  no_log: true
+
+- name: set fact for kubeconfig
+  vars:
+    kubeconfig_data: "{{ hostvars[groups['k3s'][0]]['kubeconfig_remote']['stdout'] | from_yaml}}"
+  set_fact:
+    k3s_certificate_authority_data: "{{ kubeconfig_data['clusters'][0]['cluster']['certificate-authority-data'] }}"
+    k3s_user_client_certificate_data: "{{ kubeconfig_data['users'][0]['user']['client-certificate-data'] }}"
+    k3s_user_client_key_data: "{{ kubeconfig_data['users'][0]['user']['client-key-data'] }}"
+  delegate_to: "{{ groups['deployment'][0] }}"
+  run_once: true
+  no_log: true
 
 - name: Creating kubeconfig file on the deploy node
-  become: true
   vars:
-    local_kubeconfig: "{{ hostvars[groups['k3s'][0]]['kubeconfig_remote']['stdout'] }}"
-  copy:
-    content: "{{ local_kubeconfig }}"
+    deployhost_uid: "{{ hostvars[groups['deployment'][0]]['ansible_facts']['user_uid'] }}"
+    deployhost_gid: "{{ hostvars[groups['deployment'][0]]['ansible_facts']['user_gid'] }}"
+  ansible.builtin.template:
+    src: "kubeconfig.yml.j2"
     dest: "{{ node_custom_config }}/kubeconfig.yml"
-    owner: "{{ ansible_facts.user_uid }}"
-    group: "{{ ansible_facts.user_gid }}"
+    owner: "{{ deployhost_uid }}"
+    group: "{{ deployhost_gid }}"
     mode: 0600
-  run_once: true
   delegate_to: "{{ groups['deployment'][0] }}"
-
-# TODO
-# needs kubernetes+openshift present in kolla venv
-# better way is probably just running docker run kubectl apply 
-
-- name: applying calico config
-  kubernetes.core.k8s:
-    state: present
-    src: "files/tigera-operator.yaml"
-    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
-  delegate_to: "{{ groups['deployment'][0] }}"
 
-- name: applying calico custom resources
-  kubernetes.core.k8s:
-    state: present
-    src: "templates/calico-custom-resources.yaml.j2"
-    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
-  run_once: true
+- name: run kubectl apply from the deploy node
   delegate_to: "{{ groups['deployment'][0] }}"
-
-- name: applying nvidia device plugin
-  kubernetes.core.k8s:
-    state: present
-    src: "templates/nvidia-device-plugin.yaml.j2"
-    kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
   run_once: true
-  delegate_to: "{{ groups['deployment'][0] }}"
+  block:
+    - name: installing calico operator
+      kubernetes.core.k8s:
+        state: present
+        src: "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: installing calico CRDs
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: applying calico custom resources
+      kubernetes.core.k8s:
+        state: present
+        template: "templates/calico-custom-resources.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: applying nvidia device plugin
+      kubernetes.core.k8s:
+        state: present
+        template: "templates/nvidia-device-plugin.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
