@@ -25,11 +25,26 @@
   notify:
     - "Restart {{ item.key }} container"
 
+- name: test if cluster is already configured
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl version
+  retries: 10
+  delay: 5
+  register: k3s_bootstrap_check
+  until: k3s_bootstrap_check.rc == 0
+  run_once: true
+  delegate_to: "{{ groups['k3s'][0] }}"
+  ignore_errors: true
+  changed_when: false
+
 - name: set k3s_bootstrap for initial node in cluster
   set_fact:
     k3s_bootstrap: true
   when:
     - inventory_hostname == groups["k3s"][0]
+    - k3s_bootstrap_check is not defined
 
 - name: Templating k3s_config.yaml
   vars:
