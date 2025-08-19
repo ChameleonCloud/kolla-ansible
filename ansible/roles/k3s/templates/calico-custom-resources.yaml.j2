@@ -15,9 +15,11 @@ spec:
       blockSize: 26
       cidr: "{{ k3s_cluster_cidr }}"
       disableNewAllocations: false
-      encapsulation: VXLANCrossSubnet
+      encapsulation: IPIPCrossSubnet
       natOutgoing: Enabled
       nodeSelector: all()
+  nodeAddressAutodetectionV4:
+    kubernetes: NodeInternalIP
 
 ---
 
