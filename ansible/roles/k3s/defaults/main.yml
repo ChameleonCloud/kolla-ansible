@@ -14,12 +14,24 @@ k3s_services:
         external: false
         port: "{{ k3s_port }}"
         listen_port: "{{ k3s_listen_port }}"
+        frontend_tcp_extra:
+          - "option clitcpka"
+          - "timeout client 3600s"
+        backend_tcp_extra:
+          - "option srvtcpka"
+          - "timeout server 3600s"
       k3s_external:
         enabled: "{{ enable_k3s }}"
         mode: "tcp"
         external: true
         port: "{{ k3s_port }}"
         listen_port: "{{ k3s_listen_port }}"
+        frontend_tcp_extra:
+          - "option clitcpka"
+          - "timeout client 3600s"
+        backend_tcp_extra:
+          - "option srvtcpka"
+          - "timeout server 3600s"
 
 ####################
 # Docker
