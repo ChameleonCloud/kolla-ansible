@@ -22,6 +22,12 @@ write-kubeconfig: "/root/.kube/config"
 bind-address: "{{ api_interface_address }}"
 node-ip: "{{ api_interface_address }}"
 
+# needed for haproxy VIP to be allowed
+# https://docs.k3s.io/datastore/cluster-loadbalancer#setup-load-balancer
+tls-san: 
+ - {{ kolla_internal_fqdn }}
+ - {{ kolla_external_fqdn }}
+
 {% if k3s_enable_calico | bool %}
 # extra config for calico
 flannel-backend: "none"
