@@ -30,7 +30,7 @@
   command: >
     docker exec {{ k3s_services['k3s'].container_name }}
     kubectl version
-  retries: 10
+  retries: 1
   delay: 5
   register: k3s_bootstrap_check
   until: k3s_bootstrap_check.rc == 0
