@@ -44,7 +44,7 @@
     k3s_bootstrap: true
   when:
     - inventory_hostname == groups["k3s"][0]
-    - k3s_bootstrap_check is not defined
+    -  k3s_bootstrap_check.rc | default(1) != 0
 
 - name: Templating k3s_config.yaml
   vars:
