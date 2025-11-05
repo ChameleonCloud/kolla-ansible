@@ -125,6 +125,7 @@
   become: true
   when:
     - zun_policy_file is defined
+    - item.value.enabled | bool
     - inventory_hostname in groups[item.value.group]
   with_dict: "{{ zun_services }}"
   notify:
