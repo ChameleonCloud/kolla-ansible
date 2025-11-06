@@ -474,7 +474,6 @@ prometheus_rabbitmq_exporter_port: "{{ rabbitmq_prometheus_port }}"
 prometheus_cadvisor_port: "18080"
 prometheus_fluentd_integration_port: "24231"
 prometheus_libvirt_exporter_port: "9177"
-prometheus_jupyterhub_exporter_port: "8075"
 
 # Prometheus alertmanager ports
 prometheus_alertmanager_port: "9093"
@@ -1171,7 +1170,6 @@ enable_prometheus_blackbox_exporter: "{{ enable_prometheus | bool }}"
 enable_prometheus_rabbitmq_exporter: "{{ enable_prometheus | bool and enable_rabbitmq | bool }}"
 enable_prometheus_libvirt_exporter: "no"
 enable_prometheus_snmp_exporter: "{{ enable_prometheus | bool }}"
-enable_prometheus_jupyterhub_exporter: "{{ enable_jupyterhub | bool and enable_prometheus | bool }}"
 enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
 enable_prometheus_ironic_exporter: "no"
 
