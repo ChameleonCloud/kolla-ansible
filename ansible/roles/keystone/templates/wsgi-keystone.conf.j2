@@ -67,8 +67,8 @@ LogLevel info
     OIDCScope "{{ keystone_federation_oidc_scopes }}"
 {% if keystone_oidc_provider_metadata_url is defined %}
     OIDCProviderMetadataURL "{{ keystone_oidc_provider_metadata_url }}"
-    OIDCClientID "{{ keystone_oidc_client_id }}"
-    OIDCClientSecret "{{ keystone_oidc_client_secret }}"
+    OIDCClientID "{{ keystone_idp_client_id }}"
+    OIDCClientSecret "{{ keystone_idp_client_secret }}"
 {% else %}
     OIDCMetadataDir {{ keystone_container_federation_oidc_metadata_folder }}
 {% endif %}
