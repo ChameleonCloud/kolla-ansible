@@ -1169,8 +1169,8 @@ enable_prometheus_elasticsearch_exporter: "{{ enable_prometheus | bool and enabl
 enable_prometheus_blackbox_exporter: "{{ enable_prometheus | bool }}"
 enable_prometheus_rabbitmq_exporter: "{{ enable_prometheus | bool and enable_rabbitmq | bool }}"
 enable_prometheus_libvirt_exporter: "no"
-enable_prometheus_snmp_exporter: "{{ enable_prometheus | bool }}"
-enable_prometheus_ipmi_exporter: "{{ enable_prometheus | bool }}"
+enable_prometheus_snmp_exporter: "no"
+enable_prometheus_ipmi_exporter: "no"
 enable_prometheus_ironic_exporter: "no"
 
 prometheus_alertmanager_user: "admin"
