@@ -736,6 +736,12 @@ compute
 [prometheus-snmp-exporter:children]
 monitoring
 
+[prometheus-ipmi-exporter:children]
+monitoring
+
+[prometheus-ironic-exporter:children]
+monitoring
+
 [masakari-api:children]
 control
 
