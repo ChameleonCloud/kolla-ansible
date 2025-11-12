@@ -91,3 +91,9 @@
         apply: yes
         template: "templates/calico-custom-resources.yaml.j2"
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: applying calico global network policies
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        src: "calico-global-networkpolicy.yaml"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
