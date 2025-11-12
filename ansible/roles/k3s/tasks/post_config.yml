@@ -48,3 +48,46 @@
     mode: 0600
   delegate_to: "{{ groups['deployment'][0] }}"
   run_once: true
+
+- name: run kubectl apply from the deploy node
+  delegate_to: "{{ groups['deployment'][0] }}"
+  run_once: true
+  block:
+    - name: Download calico operator manifest
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml"
+        dest: "/tmp/tigera-operator.yaml"
+        mode: '0644'
+    - name: installing calico operator
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        src: /tmp/tigera-operator.yaml
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: Wait for calico operator to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: tigera-operator
+        namespace: tigera-operator
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Available
+          status: "True"
+        wait_timeout: 300
+    - name: Wait for Installation CRD to be registered
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        name: installations.operator.tigera.io
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Established
+          status: "True"
+        wait_timeout: 300
+    - name: patching calico custom resources
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        template: "templates/calico-custom-resources.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"

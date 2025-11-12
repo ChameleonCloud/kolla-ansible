@@ -46,3 +46,6 @@ k3s_registration_address: "https://{{ kolla_external_fqdn }}:{{ k3s_port }}"
 
 # task sets this to true IFF running on first server in cluster
 k3s_bootstrap: false
+
+k3s_enable_calico: true
+calico_version: v3.30.2
