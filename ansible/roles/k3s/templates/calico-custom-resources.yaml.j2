@@ -16,9 +16,26 @@ spec:
         blockSize: 26
         cidr: "{{ k3s_cluster_cidr }}"
         disableNewAllocations: false
-        encapsulation: IPIPCrossSubnet
+        encapsulation: IPIP
         natOutgoing: Enabled
         nodeSelector: all()
+    nodeAddressAutodetectionV4:
+      firstFound: false
+      interface: wg-.*
+    containerIPForwarding: Enabled
+  controlPlaneNodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  typhaDeployment:
+    spec:
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
 
 ---
 # This section configures the Calico API server.
