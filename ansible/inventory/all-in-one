@@ -758,6 +758,9 @@ letsencrypt
 [letsencrypt-certbot:children]
 letsencrypt
 
+[k3s:children]
+control
+
 [doni:children]
 control
 
