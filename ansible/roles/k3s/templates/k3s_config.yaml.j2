@@ -1,0 +1,36 @@
+---
+################
+# cluster-config
+################
+
+cluster-cidr: "{{ k3s_cluster_cidr }}"
+
+
+###################
+# per-server config
+###################
+# use the token from passwords.yml to join servers
+token: "{{ k3s_token }}"
+
+# log path inside the k3s kolla container
+log: /var/log/kolla/k3s/k3s.log
+# write kubeconfig inside container so that docker exec kubectl works
+write-kubeconfig-mode: "0644"
+write-kubeconfig: "/root/.kube/config"
+
+# bind to internal API address
+bind-address: "{{ k3s_bind_address }}"
+node-ip: "{{ k3s_node_ip }}"
+
+# also set tls-san so cert is valid via haproxy
+tls-san: "{{ kolla_external_fqdn }}"
+
+######################
+# Server bootstrapping
+######################
+{% if k3s_bootstrap | bool %}
+# set this when bootstrapping first node
+cluster-init: true
+{% else %}
+server: "{{ k3s_registration_address }}"
+{% endif %}

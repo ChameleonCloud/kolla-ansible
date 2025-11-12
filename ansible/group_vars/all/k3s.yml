@@ -1,0 +1,7 @@
+---
+enable_k3s: false
+
+k3s_internal_fqdn: "{{ kolla_internal_fqdn }}"
+k3s_external_fqdn: "{{ kolla_external_fqdn }}"
+k3s_port: "6443"
+k3s_listen_port: "{{ k3s_port }}"

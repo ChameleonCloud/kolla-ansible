@@ -54,6 +54,7 @@
       - { name: "heat", enabled: "{{ enable_heat | bool }}" }
       - { name: "horizon", enabled: "{{ enable_horizon | bool }}" }
       - { name: "ironic", enabled: "{{ enable_ironic | bool }}" }
+      - { name: "k3s", enabled: "{{ enable_k3s | bool }}" }
       - { name: "keystone", enabled: "{{ enable_keystone | bool }}" }
       - { name: "kuryr", enabled: "{{ enable_kuryr | bool }}" }
       - { name: "magnum", enabled: "{{ enable_magnum | bool }}" }

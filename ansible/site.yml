@@ -44,6 +44,7 @@
         - enable_horizon_{{ enable_horizon | bool }}
         - enable_ironic_{{ enable_ironic | bool }}
         - enable_iscsid_{{ enable_iscsid | bool }}
+        - enable_k3s_{{ enable_k3s | bool }}
         - enable_keystone_{{ enable_keystone | bool }}
         - enable_kuryr_{{ enable_kuryr | bool }}
         - enable_letsencrypt_{{ enable_letsencrypt | bool }}
@@ -261,6 +262,12 @@
             tasks_from: loadbalancer
           tags: ironic
           when: enable_ironic | bool
+        - name: Configure loadbalancer for k3s
+          ansible.builtin.include_role:
+            name: k3s
+            tasks_from: loadbalancer
+          tags: k3s
+          when: enable_k3s | bool
         - name: Configure loadbalancer for keystone
           ansible.builtin.include_role:
             name: keystone
@@ -1011,6 +1018,15 @@
        default(100) }}
   roles:
     - { role: octavia, tags: octavia }
+
+- name: Apply role k3s
+  gather_facts: false
+  hosts:
+    - k3s
+    - "&enable_k3s_True"
+  serial: '{{ kolla_serial|default("0") }}'
+  roles:
+    - { role: k3s, tags: k3s, when: enable_k3s | bool }
 
 - name: Apply role zun
   gather_facts: false

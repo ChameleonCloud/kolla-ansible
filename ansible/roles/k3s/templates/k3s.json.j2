@@ -1,0 +1,18 @@
+{
+    "command": "k3s server",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/k3s_config.yaml",
+            "dest": "/etc/rancher/k3s/config.yaml",
+            "owner": "k3s",
+            "perm": "0600"
+        }
+    ],
+    "permissions": [
+        {
+            "path": "/var/log/kolla/k3s",
+            "owner": "k3s:k3s",
+            "recurse": true
+        }
+    ]
+}
