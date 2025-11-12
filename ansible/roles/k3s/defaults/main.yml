@@ -55,3 +55,8 @@ calico_version: v3.30.2
 ########################
 k3s_nvidia_device_plugin_version: "v0.14.1"
 k3s_nvidia_device_plugin_image_full: "nvcr.io/nvidia/k8s-device-plugin:{{ k3s_nvidia_device_plugin_version }}"
+
+###############################
+# Smarter device manager config
+###############################
+k3s_smarter_device_plugin_version: "v1.20.11"

@@ -103,3 +103,9 @@
         apply: yes
         template: "templates/nvidia-device-plugin.yaml.j2"
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: applying smarter devices manager plugin
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        template: "templates/smarter-device-manager.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
