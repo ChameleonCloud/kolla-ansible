@@ -6,3 +6,6 @@
 
 - name: Flush handlers
   meta: flush_handlers
+
+# Need to run these tasks after k3s api server has started
+- import_tasks: post_config.yml
