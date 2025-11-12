@@ -25,6 +25,14 @@ node-ip: "{{ k3s_node_ip }}"
 # also set tls-san so cert is valid via haproxy
 tls-san: "{{ kolla_external_fqdn }}"
 
+{% if k3s_enable_calico | bool %}
+# extra config for calico
+flannel-backend: "none"
+disable-network-policy: true
+disable:
+    - traefik
+{% endif %}
+
 ######################
 # Server bootstrapping
 ######################
