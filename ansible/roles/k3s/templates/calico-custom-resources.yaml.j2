@@ -21,7 +21,7 @@ spec:
         nodeSelector: all()
     nodeAddressAutodetectionV4:
       firstFound: false
-      interface: wg-.*
+      kubernetes: NodeInternalIP
     containerIPForwarding: Enabled
   controlPlaneNodeSelector:
     node-role.kubernetes.io/control-plane: "true"
