@@ -75,6 +75,7 @@
           type: Available
           status: "True"
         wait_timeout: 300
+        
     - name: Wait for Installation CRD to be registered
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
@@ -91,6 +92,17 @@
         apply: yes
         template: "templates/calico-custom-resources.yaml.j2"
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+
+    - name: Wait for GlobalNetworkPolicy CRD to be registered
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        name: globalnetworkpolicies.crd.projectcalico.org
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Established
+          status: "True"
+        wait_timeout: 300
     - name: applying calico global network policies
       kubernetes.core.k8s:
         state: present
