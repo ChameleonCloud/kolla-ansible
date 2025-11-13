@@ -53,6 +53,11 @@
   delegate_to: "{{ groups['deployment'][0] }}"
   run_once: true
   block:
+    - name: ensure deploy host has needed deps for following steps
+      pip:
+        name:
+          - kubernetes
+      become: True
     - name: Download calico operator manifest
       ansible.builtin.get_url:
         url: "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml"
@@ -75,7 +80,7 @@
           type: Available
           status: "True"
         wait_timeout: 300
-        
+
     - name: Wait for Installation CRD to be registered
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
