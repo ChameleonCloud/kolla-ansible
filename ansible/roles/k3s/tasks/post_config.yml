@@ -97,7 +97,28 @@
         apply: yes
         template: "templates/calico-custom-resources.yaml.j2"
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
-
+    
+    - name: Wait for Calico API server deployment to exist
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: calico-apiserver
+        namespace: calico-apiserver
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+      register: apiserver_deployment
+      until: apiserver_deployment.resources | length > 0
+      retries: 30
+      delay: 10
+    - name: Wait for Calico API server to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: calico-apiserver
+        namespace: calico-apiserver
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Available
+          status: "True"
+        wait_timeout: 300
     - name: Wait for GlobalNetworkPolicy CRD to be registered
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
@@ -114,6 +135,7 @@
         apply: yes
         src: "calico-global-networkpolicy.yaml"
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+
     - name: applying nvidia device plugin
       kubernetes.core.k8s:
         state: present
