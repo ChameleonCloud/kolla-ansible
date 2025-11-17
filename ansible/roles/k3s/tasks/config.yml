@@ -1,0 +1,64 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ node_config_directory }}/{{ item.key }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ k3s_services }}"
+
+- name: Copying over config.json files for services
+  template:
+    src: "{{ item.key }}.json.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/config.json"
+    mode: "0660"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ k3s_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: test if cluster is already configured
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl version
+  retries: 1
+  delay: 5
+  register: k3s_bootstrap_check
+  until: k3s_bootstrap_check.rc == 0
+  run_once: true
+  delegate_to: "{{ groups['k3s'][0] }}"
+  ignore_errors: true
+  changed_when: false
+
+- name: set k3s_bootstrap for initial node in cluster
+  set_fact:
+    k3s_bootstrap: true
+  when:
+    - inventory_hostname == groups["k3s"][0]
+    -  k3s_bootstrap_check.rc | default(1) != 0
+
+- name: Templating k3s_config.yaml
+  vars:
+    service_name: "{{ item.key }}"
+    k3s_node_config: "{{ k3s_config }}"
+  template:
+    src: "k3s_config.yaml.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/k3s_config.yaml"
+    mode: "0660"
+  become: true
+  when:
+    - item.key in [ "k3s" ]
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ k3s_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
