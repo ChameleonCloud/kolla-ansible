@@ -208,6 +208,9 @@ keystone_host_federation_oidc_idp_certificate_folder: "{{ node_config_directory 
 keystone_host_federation_oidc_attribute_mappings_folder: "{{ node_config_directory }}/keystone/federation/oidc/attribute_maps"
 keystone_federation_oidc_jwks_uri: ""
 
+# OIDC caching
+keystone_oidc_enable_memcached: "{{ enable_memcached }}"
+
 # These variables are used to define multiple trusted Horizon dashboards.
 # keystone_trusted_dashboards: ['<https://dashboardServerOne/auth/websso/>', '<https://dashboardServerTwo/auth/websso/>', '<https://dashboardServerN/auth/websso/>']
 keystone_trusted_dashboards: "{{ ['%s://%s/auth/websso/' % (public_protocol, kolla_external_fqdn), '%s/auth/websso/' % (horizon_public_endpoint)] if enable_horizon | bool else [] }}"
@@ -218,6 +221,7 @@ keystone_federation_oidc_response_type: "id_token"
 keystone_federation_oidc_scopes: "openid email profile"
 keystone_federation_oidc_allowed_redirects: []
 
+
 ####################
 # WSGI
 ####################
@@ -227,3 +231,4 @@ keystone_wsgi_public_vhost_config: |
 keystone_wsgi_admin_vhost_config: |
   {{'#'}} Custom vhost configuration can be added here via
   {{'#'}} the `keystone_wsgi_admin_vhost_config` variable.
+

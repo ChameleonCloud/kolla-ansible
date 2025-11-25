@@ -83,6 +83,10 @@ LogLevel info
 {% if keystone_federation_oidc_allowed_redirects | length > 0 %}
     OIDCRedirectURLsAllowed {{ keystone_federation_oidc_allowed_redirects | join(" ") }}
 {% endif %}
+{% if enable_memcached | bool and keystone_oidc_enable_memcached | bool %}
+    OIDCCacheType memcache
+    OIDCMemCacheServers "{% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %} {% endif %}{% endfor %}"
+{% endif %}
 
     <Location /redirect_uri>
       Require valid-user
