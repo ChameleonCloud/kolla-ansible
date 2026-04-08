@@ -43,12 +43,18 @@ spec:
         - image: "{{ k3s_nvidia_device_plugin_image_full }}"
           name: nvidia-device-plugin-ctr
           env:
+            - name: DEVICE_LIST_STRATEGY
+              value: envvar
+            - name: DEVICE_DISCOVERY_STRATEGY
+              value: tegra
+            - name: DEVICE_ID_STRATEGY
+              value: index
             - name: FAIL_ON_INIT_ERROR
               value: "false"
             - name: NVIDIA_VISIBLE_DEVICES
               value: all
             - name: NVIDIA_DRIVER_CAPABILITIES
-              value: all
+              value: compute,utility
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -56,7 +62,19 @@ spec:
           volumeMounts:
             - name: device-plugin
               mountPath: /var/lib/kubelet/device-plugins
+            - name: cdi
+              mountPath: /var/run/cdi
+            - name: nv-tegra-release
+              mountPath: /etc/nv_tegra_release
+              readOnly: true
       volumes:
         - name: device-plugin
           hostPath:
             path: /var/lib/kubelet/device-plugins
+        - name: cdi
+          hostPath:
+            path: /var/run/cdi
+            type: DirectoryOrCreate
+        - name: nv-tegra-release
+          hostPath:
+            path: /etc/nv_tegra_release
