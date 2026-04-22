@@ -47,15 +47,6 @@ metadata:
 spec: {}
 
 ---
-# Configures the Calico Goldmane flow aggregator.
-apiVersion: operator.tigera.io/v1
-kind: Goldmane
-metadata:
-  name: default
-
----
-# Configures the Calico Whisker observability UI.
-apiVersion: operator.tigera.io/v1
-kind: Whisker
-metadata:
-  name: default
+# Goldmane and Whisker are intentionally omitted.
+# they depend on NFLOG iptables rules, nvidia L4T does not package these.
+# We don't use these features anyway.
