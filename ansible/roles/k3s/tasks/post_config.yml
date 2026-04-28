@@ -42,7 +42,7 @@
     deployhost_gid: "{{ hostvars[groups['deployment'][0]]['ansible_facts']['user_gid'] }}"
   ansible.builtin.template:
     src: "kubeconfig.yml.j2"
-    dest: "{{ node_custom_config }}/kubeconfig.yml"
+    dest: "{{ k3s_kubeconfig_path }}"
     owner: "{{ deployhost_uid }}"
     group: "{{ deployhost_gid }}"
     mode: 0600
@@ -68,13 +68,13 @@
         state: present
         apply: yes
         src: /tmp/tigera-operator.yaml
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
     - name: Wait for calico operator to be ready
       kubernetes.core.k8s_info:
         kind: Deployment
         name: tigera-operator
         namespace: tigera-operator
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
         wait: yes
         wait_condition:
           type: Available
@@ -85,7 +85,7 @@
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
         name: installations.operator.tigera.io
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
         wait: yes
         wait_condition:
           type: Established
@@ -96,14 +96,14 @@
         state: present
         apply: yes
         template: "templates/calico-custom-resources.yaml.j2"
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
     
     - name: Wait for Calico API server deployment to exist
       kubernetes.core.k8s_info:
         kind: Deployment
         name: calico-apiserver
         namespace: calico-apiserver
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
       register: apiserver_deployment
       until: apiserver_deployment.resources | length > 0
       retries: 30
@@ -113,7 +113,7 @@
         kind: Deployment
         name: calico-apiserver
         namespace: calico-apiserver
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
         wait: yes
         wait_condition:
           type: Available
@@ -123,7 +123,7 @@
       kubernetes.core.k8s_info:
         kind: CustomResourceDefinition
         name: globalnetworkpolicies.crd.projectcalico.org
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
         wait: yes
         wait_condition:
           type: Established
@@ -134,17 +134,17 @@
         state: present
         apply: yes
         src: "calico-global-networkpolicy.yaml"
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
 
     - name: applying nvidia device plugin
       kubernetes.core.k8s:
         state: present
         apply: yes
         template: "templates/nvidia-device-plugin.yaml.j2"
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"
     - name: applying smarter devices manager plugin
       kubernetes.core.k8s:
         state: present
         apply: yes
         template: "templates/smarter-device-manager.yaml.j2"
-        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        kubeconfig: "{{ k3s_kubeconfig_path }}"

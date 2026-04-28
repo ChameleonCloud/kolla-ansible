@@ -62,6 +62,9 @@ k3s_bootstrap: false
 k3s_enable_calico: true
 calico_version: v3.30.2
 
+# where to write kubeconfig file to. Defaults to site-config/node_custom_config.
+k3s_kubeconfig_path: "{{ node_custom_config }}/kubeconfig.yml"
+
 ########################
 # Nvidia Runtime config
 ########################
