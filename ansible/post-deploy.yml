@@ -3,7 +3,6 @@
   hosts: localhost
   tasks:
     - name: Template out clouds.yaml
-      become: true
       template:
         src: "roles/common/templates/clouds.yaml.j2"
         dest: "{{ admin_openrc_directory }}/clouds.yaml"
