@@ -3,9 +3,9 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Get stats of {{ node_config }}
+    - name: Get stats of {{ admin_openrc_directory }}
       stat:
-        path: "{{ node_config }}"
+        path: "{{ admin_openrc_directory }}"
       register: st
 
     - name: Set become fact
@@ -19,7 +19,7 @@
       become: "{{ needs_root }}"
       template:
         src: "roles/common/templates/clouds.yaml.j2"
-        dest: "{{ node_config }}/clouds.yaml"
+        dest: "{{ admin_openrc_directory }}/clouds.yaml"
         owner: "{{ ansible_facts.user_uid }}"
         group: "{{ ansible_facts.user_gid }}"
         mode: 0600
