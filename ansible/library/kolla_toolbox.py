@@ -112,8 +112,13 @@ NON_JSON_REG = re.compile((r'^(?P<host>\w+) \| (?P<status>\w+)!? \| '
                           re.MULTILINE | re.DOTALL)
 
 
-def gen_commandline(params):
+def gen_commandline(module: AnsibleModule):
     command = ['ansible', 'localhost']
+    if module.check_mode:
+        command.append("--check")
+    if module._diff:
+        command.append("--diff")
+    params = module.params
     if params.get('module_name'):
         command.extend(['-m', params.get('module_name')])
     if params.get('module_args'):
@@ -162,11 +167,12 @@ def main():
         timeout=dict(required=False, type='int', default=180),
         user=dict(required=False, type='str'),
     )
-    module = AnsibleModule(argument_spec=specs, bypass_checks=True)
+    module = AnsibleModule(argument_spec=specs, bypass_checks=True,
+                           supports_check_mode=True)
     client = get_docker_client()(
         version=module.params.get('api_version'),
         timeout=module.params.get('timeout'))
-    command_line = gen_commandline(module.params)
+    command_line = gen_commandline(module)
     kolla_toolbox = client.containers(filters=dict(name='kolla_toolbox',
                                                    status='running'))
     if not kolla_toolbox:
