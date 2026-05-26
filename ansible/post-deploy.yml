@@ -1,21 +1,25 @@
 ---
+- name: Determining whether we need become=true
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Get stats of {{ admin_openrc_directory }}
+      stat:
+        path: "{{ admin_openrc_directory }}"
+      register: st
+
+    - name: Set become fact
+      set_fact:
+        needs_root: "{{ not (st.stat.writeable | bool) }}"
+
 - name: Creating clouds.yaml file on the deploy node
   hosts: localhost
   tasks:
-    - name: Create /etc/openstack directory
-      become: true
-      file:
-        state: directory
-        dest: "/etc/openstack"
-        owner: "{{ ansible_facts.user_uid }}"
-        group: "{{ ansible_facts.user_gid }}"
-        mode: 0700
-
     - name: Template out clouds.yaml
-      become: true
+      become: "{{ needs_root }}"
       template:
         src: "roles/common/templates/clouds.yaml.j2"
-        dest: "{{ node_config }}/clouds.yaml"
+        dest: "{{ admin_openrc_directory }}/clouds.yaml"
         owner: "{{ ansible_facts.user_uid }}"
         group: "{{ ansible_facts.user_gid }}"
         mode: 0600
@@ -24,6 +28,7 @@
   hosts: localhost
   tasks:
     - name: Template out admin-openrc.sh
+      become: "{{ needs_root }}"
       template:
         src: "roles/common/templates/admin-openrc.sh.j2"
         dest: "{{ admin_openrc_directory }}/admin-openrc.sh"
@@ -61,6 +66,8 @@
     - import_role:
         name: octavia
         tasks_from: openrc.yml
+      vars:
+        octavia_openrc_become: "{{ needs_root }}"
       when: enable_octavia | bool
 
 - import_playbook: "{{ post_deploy_extra_play }}"
