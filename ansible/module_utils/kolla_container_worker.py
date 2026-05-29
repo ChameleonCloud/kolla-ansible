@@ -12,6 +12,7 @@
 
 from abc import ABC
 from abc import abstractmethod
+import grp
 import logging
 import shlex
 
@@ -71,6 +72,7 @@ class ContainerWorker(ABC):
 
         return (
             self.compare_cap_add(container_info) or
+            self.compare_group_add(container_info) or
             self.compare_security_opt(container_info) or
             self.compare_image(container_info) or
             self.compare_ipc_mode(container_info) or
@@ -112,6 +114,29 @@ class ContainerWorker(ABC):
             current_cap_add = list()
         if set(new_cap_add).symmetric_difference(set(current_cap_add)):
             return True
+
+    @staticmethod
+    def _resolve_group_id(group):
+        try:
+            int(group)
+            return str(group)
+        except ValueError:
+            pass
+        return str(grp.getgrnam(group).gr_gid)
+
+    @property
+    def _resolved_group_add(self):
+        return [self._resolve_group_id(g)
+                for g in self.params.get('group_add') or []]
+
+    def compare_group_add(self, container_info):
+        try:
+            current_group_add = container_info['HostConfig'].get(
+                'GroupAdd') or []
+        except (KeyError, TypeError):
+            current_group_add = []
+        return bool(set(self._resolved_group_add).symmetric_difference(
+            set(current_group_add)))
 
     def compare_security_opt(self, container_info):
         ipc_mode = self.params.get('ipc_mode')
