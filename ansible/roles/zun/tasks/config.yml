@@ -60,22 +60,34 @@
   become: true
   with_dict: "{{ zun_services | select_services_enabled_and_mapped_to_host }}"
 
-# allow this task to fail, as this will run before a kubeconfig file is available, then must be rerun
-- name: Copying over kubeconfig for k8s agent
+- name: Check if kubeconfig exists for zun-compute-k8s
+  vars:
+    service_name: zun-compute-k8s
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: zun_kubeconfig
+  with_first_found:
+    - skip: true
+      files:
+        - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
+        - "{{ node_custom_config }}/zun/kubeconfig.yml"
+        - "{{ node_custom_config }}/kubeconfig.yml"
+        - "kubeconfig.yml.j2"
+  when:
+    - enable_zun_compute_k8s | bool
+
+- name: Copying over kubeconfig for zun k8s compute agent
   vars:
     service: "{{ zun_services['zun-compute-k8s'] }}"
   copy:
-    src: "{{ item }}"
+    src: "{{ zun_kubeconfig.results.0.stat.path }}"
     dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
     mode: "0600"
-  with_first_found:
-    - "{{ node_custom_config }}/zun/{{ inventory_hostname }}/kubeconfig.yml"
-    - "{{ node_custom_config }}/zun/kubeconfig.yml"
-    - "{{ node_custom_config }}/kubeconfig.yml"
-    - "kubeconfig.yml.j2"
   become: true
   ignore_errors: true
-  when: service | service_enabled_and_mapped_to_host
+  when:
+    - zun_kubeconfig.results
+    - service | service_enabled_and_mapped_to_host
 
 - name: Copying over wsgi-zun files for services
   vars:
