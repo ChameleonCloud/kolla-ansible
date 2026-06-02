@@ -1,0 +1,74 @@
+---
+k3s_services:
+  k3s:
+    container_name: k3s
+    group: k3s
+    enabled: true
+    image: "{{ k3s_image_full }}"
+    volumes: "{{ k3s_default_volumes + k3s_extra_volumes }}"
+    privileged: true
+    haproxy:
+      k3s:
+        enabled: "{{ enable_k3s }}"
+        mode: "tcp"
+        external: false
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_listen_port }}"
+        frontend_tcp_extra:
+          - "option clitcpka"
+          - "timeout client 3600s"
+        backend_tcp_extra:
+          - "option srvtcpka"
+          - "timeout server 3600s"
+      k3s_external:
+        enabled: "{{ enable_k3s }}"
+        mode: "tcp"
+        external: true
+        port: "{{ k3s_port }}"
+        listen_port: "{{ k3s_listen_port }}"
+        frontend_tcp_extra:
+          - "option clitcpka"
+          - "timeout client 3600s"
+        backend_tcp_extra:
+          - "option srvtcpka"
+          - "timeout server 3600s"
+
+####################
+# Docker
+####################
+k3s_install_type: "{{ kolla_install_type }}"
+k3s_tag: "{{ openstack_tag }}"
+k3s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ k3s_install_type }}-k3s"
+k3s_image_full: "{{ k3s_image }}:{{ k3s_tag }}"
+
+k3s_default_volumes:
+  - "{{ node_config_directory }}/k3s/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/etc/machine-id:/etc/machine-id:ro"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "kolla_logs:/var/log/kolla"
+  - "k3s_server:/var/lib/rancher/k3s"
+
+k3s_extra_volumes: "{{ default_extra_volumes }}"
+
+k3s_cluster_cidr: "192.168.0.0/16"
+k3s_bind_address: "{{ api_interface_address }}"
+k3s_node_ip: "{{ api_interface_address }}"
+k3s_registration_address: "https://{{ kolla_external_fqdn }}:{{ k3s_port }}"
+
+# task sets this to true IFF running on first server in cluster
+k3s_bootstrap: false
+
+k3s_enable_calico: true
+calico_version: v3.30.2
+
+########################
+# Nvidia Runtime config
+########################
+k3s_nvidia_device_plugin_version: "v0.14.1"
+k3s_nvidia_device_plugin_image_full: "nvcr.io/nvidia/k8s-device-plugin:{{ k3s_nvidia_device_plugin_version }}"
+
+###############################
+# Smarter device manager config
+###############################
+k3s_smarter_device_plugin_version: "v1.20.11"

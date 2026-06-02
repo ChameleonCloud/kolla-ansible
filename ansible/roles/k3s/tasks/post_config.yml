@@ -1,0 +1,150 @@
+---
+- name: wait for k3s to start
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl wait --for=jsonpath='.metadata.annotations.k3s\.io/internal-ip' node {{ ansible_facts['nodename'] }}
+  retries: 10
+  delay: 5
+  register: result
+  until: result.rc == 0
+  run_once: true
+  delegate_to: "{{ groups['k3s'][0] }}"
+  changed_when: false
+
+# runs on first k3s server host
+# exec and extract kubeconfig to variable
+- name: get kubeconfig from k3s
+  become: true
+  command: >
+    docker exec {{ k3s_services['k3s'].container_name }}
+    kubectl config view --raw
+  register: kubeconfig_remote
+  run_once: true
+  delegate_to: "{{ groups['k3s'][0] }}"
+  changed_when: false
+  no_log: true
+
+- name: set fact for kubeconfig
+  vars:
+    kubeconfig_data: "{{ hostvars[groups['k3s'][0]]['kubeconfig_remote']['stdout'] | from_yaml}}"
+  set_fact:
+    k3s_certificate_authority_data: "{{ kubeconfig_data['clusters'][0]['cluster']['certificate-authority-data'] }}"
+    k3s_user_client_certificate_data: "{{ kubeconfig_data['users'][0]['user']['client-certificate-data'] }}"
+    k3s_user_client_key_data: "{{ kubeconfig_data['users'][0]['user']['client-key-data'] }}"
+  delegate_to: "{{ groups['deployment'][0] }}"
+  run_once: true
+  no_log: true
+
+- name: Creating kubeconfig file on the deploy node
+  vars:
+    deployhost_uid: "{{ hostvars[groups['deployment'][0]]['ansible_facts']['user_uid'] }}"
+    deployhost_gid: "{{ hostvars[groups['deployment'][0]]['ansible_facts']['user_gid'] }}"
+  ansible.builtin.template:
+    src: "kubeconfig.yml.j2"
+    dest: "{{ node_custom_config }}/kubeconfig.yml"
+    owner: "{{ deployhost_uid }}"
+    group: "{{ deployhost_gid }}"
+    mode: 0600
+  delegate_to: "{{ groups['deployment'][0] }}"
+  run_once: true
+
+- name: run kubectl apply from the deploy node
+  delegate_to: "{{ groups['deployment'][0] }}"
+  run_once: true
+  block:
+    - name: ensure deploy host has needed deps for following steps
+      pip:
+        name:
+          - kubernetes
+      become: True
+    - name: Download calico operator manifest
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml"
+        dest: "/tmp/tigera-operator.yaml"
+        mode: '0644'
+    - name: installing calico operator
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        src: /tmp/tigera-operator.yaml
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: Wait for calico operator to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: tigera-operator
+        namespace: tigera-operator
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Available
+          status: "True"
+        wait_timeout: 300
+
+    - name: Wait for Installation CRD to be registered
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        name: installations.operator.tigera.io
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Established
+          status: "True"
+        wait_timeout: 300
+    - name: patching calico custom resources
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        template: "templates/calico-custom-resources.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    
+    - name: Wait for Calico API server deployment to exist
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: calico-apiserver
+        namespace: calico-apiserver
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+      register: apiserver_deployment
+      until: apiserver_deployment.resources | length > 0
+      retries: 30
+      delay: 10
+    - name: Wait for Calico API server to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: calico-apiserver
+        namespace: calico-apiserver
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Available
+          status: "True"
+        wait_timeout: 300
+    - name: Wait for GlobalNetworkPolicy CRD to be registered
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        name: globalnetworkpolicies.crd.projectcalico.org
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+        wait: yes
+        wait_condition:
+          type: Established
+          status: "True"
+        wait_timeout: 300
+    - name: applying calico global network policies
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        src: "calico-global-networkpolicy.yaml"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+
+    - name: applying nvidia device plugin
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        template: "templates/nvidia-device-plugin.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
+    - name: applying smarter devices manager plugin
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        template: "templates/smarter-device-manager.yaml.j2"
+        kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"

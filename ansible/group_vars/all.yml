@@ -378,6 +378,11 @@ ironic_http_port: "8089"
 
 iscsi_port: "3260"
 
+k3s_internal_fqdn: "{{ kolla_internal_fqdn }}"
+k3s_external_fqdn: "{{ kolla_external_fqdn }}"
+k3s_port: "6443"
+k3s_listen_port: "{{ k3s_port }}"
+
 keystone_public_port: "5000"
 keystone_public_listen_port: "{{ keystone_public_port }}"
 # NOTE(yoctozepto): Admin port settings are kept only for upgrade compatibility.
