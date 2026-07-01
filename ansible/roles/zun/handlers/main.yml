@@ -92,7 +92,7 @@
     service_name: "zun-compute-k8s"
     service: "{{ zun_services[service_name] }}"
   become: true
-  kolla_docker:
+  kolla_container:
     action: "recreate_or_restart_container"
     common_options: "{{ zun_docker_common_options }}"
     name: "{{ service.container_name }}"

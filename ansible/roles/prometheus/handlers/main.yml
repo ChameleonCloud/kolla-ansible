@@ -156,7 +156,7 @@
     service_name: "prometheus-snmp-exporter"
     service: "{{ prometheus_services[service_name] }}"
   become: true
-  kolla_docker:
+  kolla_container:
     action: "recreate_or_restart_container"
     common_options: "{{ docker_common_options }}"
     name: "{{ service.container_name }}"
