@@ -42,7 +42,7 @@
             "owner": "horizon",
             "perm": "0600",
             "optional": true
-        },{% if horizon_enable_tls_backend | bool %},
+        }{% if horizon_enable_tls_backend | bool %},
         {
             "source": "{{ container_config_directory }}/horizon-cert.pem",
             "dest": "/etc/horizon/certs/horizon-cert.pem",
