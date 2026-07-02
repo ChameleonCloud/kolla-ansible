@@ -74,7 +74,6 @@ doni_worker_extra_volumes: "{{ doni_extra_volumes }}"
 ####################
 # OpenStack
 ####################
-doni_admin_endpoint: "{{ admin_protocol }}://{{ doni_internal_fqdn | put_address_in_context('url') }}:{{ doni_api_port }}"
 doni_internal_endpoint: "{{ internal_protocol }}://{{ doni_internal_fqdn | put_address_in_context('url') }}:{{ doni_api_port }}"
 doni_public_endpoint: "{{ public_protocol }}://{{ doni_external_fqdn | put_address_in_context('url') }}:{{ doni_api_port }}"
 
@@ -115,7 +114,6 @@ doni_ks_services:
     type: "inventory"
     description: "doni inventory management service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ doni_admin_endpoint }}'}
       - {'interface': 'internal', 'url': '{{ doni_internal_endpoint }}'}
       - {'interface': 'public', 'url': '{{ doni_public_endpoint }}'}
 
