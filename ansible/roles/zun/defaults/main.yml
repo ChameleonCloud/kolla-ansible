@@ -19,6 +19,7 @@ zun_services:
         backend_http_extra:
           - "option httpchk GET /healthcheck"
           - "http-check expect status 200"
+          - "timeout server 5m"
       zun_api_external:
         enabled: "{{ enable_zun }}"
         mode: "http"
@@ -29,6 +30,7 @@ zun_services:
         backend_http_extra:
           - "option httpchk GET /healthcheck"
           - "http-check expect status 200"
+          - "timeout server 5m"
   zun-wsproxy:
     container_name: zun_wsproxy
     group: zun-wsproxy
@@ -43,11 +45,15 @@ zun_services:
         mode: "http"
         external: false
         port: "{{ zun_wsproxy_port }}"
+        backend_http_extra:
+          - "timeout tunnel 1h"
       zun_wsproxy_external:
         enabled: "{{ enable_zun }}"
         mode: "http"
         external: true
         port: "{{ zun_wsproxy_port }}"
+        backend_http_extra:
+          - "timeout tunnel 1h"
   zun-compute:
     container_name: zun_compute
     group: zun-compute
