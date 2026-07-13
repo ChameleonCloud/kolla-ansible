@@ -124,8 +124,18 @@ def gen_commandline(params):
             # account for string arguments
             module_args = split(params.get('module_args'))
         if isinstance(module_args, dict):
-            module_args = ' '.join("{}='{}'".format(key, value)
-                                   for key, value in module_args.items())
+            # Due to difficulty in reliably serializing complex arg types
+            # to CLI arguments passed via -a, instead pass as a combination
+            # of variable references and extra_vars which contain the values.
+            # The --extra-vars functionality supports JSON serialized input.
+            module_arg_mapping = {
+              'module_arg_{}'.format(key): value
+              for key, value in module_args.items()
+            }
+            command.extend(['--extra-vars', json.dumps(module_arg_mapping)])
+            module_args = (
+              ' '.join("{}='{{{{ module_arg_{} }}}}'".format(key, key)
+                       for key in module_args.keys()))
         if isinstance(module_args, list):
             module_args = ' '.join(module_args)
         command.extend(['-a', module_args])
