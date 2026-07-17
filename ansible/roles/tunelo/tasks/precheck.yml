@@ -1,10 +1,18 @@
 ---
+- import_role:
+    name: service-precheck
+  vars:
+    service_precheck_services: "{{ tunelo_services }}"
+    service_name: "{{ project_name }}"
+
 - name: Get container facts
   become: true
   kolla_container_facts:
+    action: get_containers
     container_engine: "{{ kolla_container_engine }}"
     name:
       - tunelo_api
+  check_mode: false
   register: container_facts
 
 - name: Checking free port for tunelo API
