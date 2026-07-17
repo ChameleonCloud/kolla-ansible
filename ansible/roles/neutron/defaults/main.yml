@@ -211,7 +211,7 @@ neutron_services:
     image: "{{ neutron_wireguard_agent_image_full }}"
     enabled: "{{ enable_neutron_wireguard | bool }}"
     privileged: True
-    host_in_groups: {{ inventory_hostname in groups['neutron-l3-agent'] }}
+    host_in_groups: "{{ inventory_hostname in groups['neutron-l3-agent'] }}"
     volumes: "{{ neutron_wireguard_agent_default_volumes + neutron_server_plugin_volumes + neutron_wireguard_agent_extra_volumes }}"
     dimensions: "{{ neutron_wireguard_agent_dimensions }}"
 
