@@ -40,6 +40,21 @@ doni_database_enable_tls_internal: "{{ database_enable_tls_internal | bool }}"
 
 
 ####################
+# Database sharding
+####################
+doni_database_shard_root_user: "{% if enable_proxysql | bool %}root_shard_{{ doni_database_shard_id }}{% else %}{{ database_user }}{% endif %}"
+doni_database_shard_id: "{{ mariadb_default_database_shard_id | int }}"
+doni_database_shard:
+  users:
+    - user: "{{ doni_database_user }}"
+      password: "{{ doni_database_password }}"
+      shard_id: "{{ doni_database_shard_id }}"
+  rules:
+    - schema: "{{ doni_database_name }}"
+      shard_id: "{{ doni_database_shard_id }}"
+
+
+####################
 # Docker
 ####################
 doni_tag: "{{ openstack_tag }}"
