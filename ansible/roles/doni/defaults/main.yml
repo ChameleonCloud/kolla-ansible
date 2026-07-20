@@ -39,6 +39,20 @@ doni_database_address: "{{ database_address | put_address_in_context('url') }}:{
 
 
 ####################
+# Database sharding
+####################
+doni_database_shard_root_user: "{% if enable_proxysql | bool %}root_shard_{{ doni_database_shard_id }}{% else %}{{ database_user }}{% endif %}"
+doni_database_shard_id: "{{ mariadb_default_database_shard_id | int }}"
+doni_database_shard:
+  users:
+    - user: "{{ doni_database_user }}"
+      password: "{{ doni_database_password }}"
+  rules:
+    - schema: "{{ doni_database_name }}"
+      shard_id: "{{ doni_database_shard_id }}"
+
+
+####################
 # Docker
 ####################
 doni_tag: "{{ openstack_tag }}"
