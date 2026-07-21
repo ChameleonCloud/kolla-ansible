@@ -121,30 +121,20 @@ class KollaToolboxWorker():
             )
         return cont[0]
 
-    def _format_module_args(self, module_args: dict) -> list:
-        """Format dict of module parameters into list of 'key=value' pairs."""
-        pairs = list()
-        for key, value in module_args.items():
-            if isinstance(value, dict):
-                value_json = json.dumps(value)
-                pairs.append(f"{key}='{value_json}'")
-            else:
-                pairs.append(f"{key}='{value}'")
-        return pairs
-
     def _generate_command(self) -> list:
         """Generate the command that will be executed inside kolla_toolbox."""
-        args_formatted = self._format_module_args(
-            self.module.params.get('module_args'))
-        extra_vars_formatted = self._format_module_args(
-            self.module.params.get('module_extra_vars'))
 
         command = ['ansible', 'localhost']
         command.extend(['-m', self.module.params.get('module_name')])
-        if args_formatted:
-            command.extend(['-a', ' '.join(args_formatted)])
-        if extra_vars_formatted:
-            command.extend(['-e', ' '.join(extra_vars_formatted)])
+
+        module_args = self.module.params.get('module_args')
+        if module_args:
+            command.extend(['-a', json.dumps(module_args)])
+
+        module_extra_vars = self.module.params.get('module_extra_vars')
+        if module_extra_vars:
+            command.extend(['-e', json.dumps(module_extra_vars)])
+
         if self.module.check_mode:
             command.append('--check')
 
