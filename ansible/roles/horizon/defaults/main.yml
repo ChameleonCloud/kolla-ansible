@@ -155,6 +155,9 @@ horizon_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
 horizon_dev_mode: "{{ kolla_dev_mode }}"
 horizon_source_version: "{{ kolla_source_version }}"
 
+# 2024.1 only workaround
+horizon_local_settings_d: "{{ ('/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/openstack_dashboard/local/local_settings.d') if horizon_dev_mode | bool else '/etc/openstack-dashboard/local_settings.d' }}"
+
 horizon_blazar_dev_mode: "{{ kolla_dev_mode }}"
 horizon_blazar_source_version: "{{ kolla_source_version }}"
 
