@@ -101,6 +101,10 @@
     mode: "0600"
   become: true
   when: service | service_enabled_and_mapped_to_host
+  with_items:
+    - "manila-nfs-ganesha"
+  notify:
+    - Restart manila-nfs-ganesha container
 
 - name: Copying over ceph.conf
   vars:
@@ -111,3 +115,7 @@
     mode: "0600"
   become: true
   when: service | service_enabled_and_mapped_to_host
+  with_items:
+    - "manila-nfs-ganesha"
+  notify:
+    - Restart manila-nfs-ganesha container
