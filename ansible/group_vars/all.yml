@@ -298,7 +298,9 @@ om_enable_rabbitmq_stream_fanout: true
 # Networking options
 ####################
 network_interface: "eth0"
-neutron_external_interface: "eth1"
+# neutron_external_interface: "eth1"
+# CHI: backwards compatiblity for neutron_networks syntax
+neutron_external_interface: "{{ neutron_networks | default([]) | selectattr('external_interface', 'defined') | map(attribute='external_interface') | join(',') | default('eth1', true) }}"
 kolla_external_vip_interface: "{{ network_interface }}"
 api_interface: "{{ network_interface }}"
 migration_interface: "{{ api_interface }}"
@@ -1240,7 +1242,9 @@ designate_notifications_topic_name: "notifications_designate"
 # Neutron options
 #######################
 neutron_bgp_router_id: "1.1.1.1"
-neutron_bridge_name: "{{ 'br-dvs' if neutron_plugin_agent == 'vmware_dvs' else 'br_dpdk' if enable_ovs_dpdk | bool else 'br-ex' }}"
+#neutron_bridge_name: "{{ 'br-dvs' if neutron_plugin_agent == 'vmware_dvs' else 'br_dpdk' if enable_ovs_dpdk | bool else 'br-ex' }}"
+# CHI: backwards compatiblity for neutron_networks syntax
+neutron_bridge_name: "{{ neutron_networks | default([]) | selectattr('external_interface', 'defined') | map(attribute='bridge_name') | join(',') | default('br-ex', true) }}"
 neutron_physical_networks: "{% for bridge in neutron_bridge_name.split(',') %}physnet{{ loop.index }}{% if not loop.last %},{% endif %}{% endfor %}"
 # Comma-separated type of enabled ml2 type drivers
 neutron_type_drivers: "flat,vlan,vxlan{% if neutron_plugin_agent == 'ovn' %},geneve{% endif %}"
