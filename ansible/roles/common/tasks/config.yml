@@ -145,6 +145,7 @@
       - "conf/filter/00-record_transformer.conf.j2"
       - "conf/filter/01-rewrite.conf.j2"
       - "conf/filter/02-parser.conf.j2"
+      - "conf/filter/03-normalize-log-level.conf.j2"
     customised_filter_files: "{{ find_custom_fluentd_filters.files | map(attribute='path') | list }}"
     # Formats
     fluentd_format_files: "{{ default_format_files | customise_fluentd(customised_format_files) }}"
