@@ -82,6 +82,27 @@
          chunk_limit_size {{ fluentd_buffer_chunk_limit_size }}
        </buffer>
     </store>
+{% elif log_direct_to_loki %}
+  <store>
+    @type loki
+    url "{{ loki_url }}"
+    username "{{ loki_username }}"
+    password "{{ loki_password }}"
+    extra_labels {{ loki_extra_labels | combine(loki_custom_labels) | to_json }}
+    <buffer>
+      @type file
+      path /var/lib/fluentd/data/loki.buffer/{{ item.facility }}.*
+      flush_interval 10s
+      chunk_limit_size {{ fluentd_buffer_chunk_limit_size }}
+      flush_at_shutdown true
+    </buffer>
+    <label>
+      Hostname
+      Logger
+      programname
+      level log_level
+    </label>
+  </store>
 {% endif %}
 </match>
 {% endfor %}
