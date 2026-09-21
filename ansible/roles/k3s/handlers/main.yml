@@ -12,5 +12,3 @@
     cap_add: "{{ service.cap_add|default([]) }}"
     volumes: "{{ service.volumes|reject('equalto', '')|list }}"
     privileged: "{{ service.privileged | default(False) }}"
-  when:
-    - kolla_action != "config"

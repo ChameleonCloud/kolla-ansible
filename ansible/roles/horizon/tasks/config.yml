@@ -76,8 +76,6 @@
   when:
     - service | service_enabled_and_mapped_to_host
     - custom_openrc | bool
-  notify:
-    - Restart horizon container
 
 - name: Check if custom clouds.yaml.template exists
   ansible.builtin.stat:
@@ -107,8 +105,6 @@
   when:
     - service | service_enabled_and_mapped_to_host
     - custom_clouds_yaml | bool
-  notify:
-    - Restart horizon container
 
 - name: "Configure uWSGI for Horizon"
   ansible.builtin.include_role:

@@ -22,8 +22,6 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ k3s_services }}"
-  notify:
-    - "Restart {{ item.key }} container"
 
 - name: test if cluster is already configured
   become: true
@@ -60,5 +58,3 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ k3s_services }}"
-  notify:
-    - "Restart {{ item.key }} container"
