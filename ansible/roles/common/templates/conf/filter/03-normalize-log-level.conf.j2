@@ -8,38 +8,38 @@
   # <record> is applied before <replace>. If log_lebel is missing, level is set
   # to `nil` and skipped in the <replace> blocks, and no label will be emitted.
   <record>
-    level ${record["log_level"]}
+    level ${record["log_level"]&.to_s&.downcase}
   </record>
   # Order matters: a rule's output must not match any rule below it, or the
   # value gets rewritten twice.
   <replace>
     key level
-    expression /^(alert|crit|critical|emer|emerg|emergency|fatal|panic)$/i
+    expression /^(alert|crit|critical|emer|emerg|emergency|fatal|panic)$/
     replace critical
   </replace>
   <replace>
     key level
-    expression /^(eror|err|error)$/i
+    expression /^(eror|err|error)$/
     replace error
   </replace>
   <replace>
     key level
-    expression /^(warn|warning)$/i
+    expression /^(warn|warning)$/
     replace warn
   </replace>
   <replace>
     key level
-    expression /^(audit|info|information|informational|note|notice)$/i
+    expression /^(audit|info|information|informational|note|notice)$/
     replace info
   </replace>
   <replace>
     key level
-    expression /^(dbg|debug|verbose)$/i
+    expression /^(dbg|debug|verbose)$/
     replace debug
   </replace>
   <replace>
     key level
-    expression /^trace$/i
+    expression /^trace$/
     replace trace
   </replace>
   # Catch-all: If nothing matches, set the values to `unknown`
