@@ -213,6 +213,11 @@ prometheus_node_exporter_targets_extra: []
 # For a list of modules see the alertmanager config.
 prometheus_blackbox_exporter_endpoints: "{{ prometheus_blackbox_exporter_endpoints_default | selectattr('enabled', 'true') | map(attribute='endpoints') | flatten | union(prometheus_blackbox_exporter_endpoints_custom) | unique | select | list | sort }}"
 
+# Allow disabling the blackbox exporter for misbehaving endpoints.
+enable_blackbox_exporter_blazar: true
+enable_blackbox_exporter_ceph_rgw: true
+enable_blackbox_exporter_horizon: true
+
 prometheus_blackbox_exporter_endpoints_default:
   # OpenStack endpoints
   - endpoints:
@@ -226,11 +231,11 @@ prometheus_blackbox_exporter_endpoints_default:
   - endpoints:
       - "blazar:os_endpoint:{{ blazar_public_base_endpoint }}"
       - "{{ ('blazar_internal:os_endpoint:' + blazar_internal_base_endpoint) if not kolla_same_external_internal_vip | bool }}"
-    enabled: "{{ enable_blazar | bool }}"
+    enabled: "{{ enable_blazar | bool and enable_blackbox_exporter_blazar | bool }}"
   - endpoints:
       - "ceph_rgw:http_2xx:{{ ceph_rgw_public_base_endpoint }}"
       - "{{ ('ceph_rgw_internal:http_2xx:' + ceph_rgw_internal_base_endpoint) if not kolla_same_external_internal_vip | bool }}"
-    enabled: "{{ enable_ceph_rgw | bool }}"
+    enabled: "{{ enable_ceph_rgw | bool and enable_blackbox_exporter_ceph_rgw | bool }}"
   - endpoints:
       - "cinder:os_endpoint:{{ cinder_public_base_endpoint }}"
       - "{{ ('cinder_internal:os_endpoint:' + cinder_internal_base_endpoint) if not kolla_same_external_internal_vip | bool }}"
@@ -260,7 +265,7 @@ prometheus_blackbox_exporter_endpoints_default:
   - endpoints:
       - "horizon:http_2xx:{{ horizon_public_endpoint }}"
       - "{{ ('horizon_internal:http_2xx:' + horizon_internal_endpoint) if not kolla_same_external_internal_vip | bool }}"
-    enabled: "{{ enable_horizon | bool }}"
+    enabled: "{{ enable_horizon | bool and enable_blackbox_exporter_horizon | bool }}"
   - endpoints:
       - "ironic:os_endpoint:{{ ironic_public_endpoint }}"
       - "{{ ('ironic_internal:os_endpoint:' + ironic_internal_endpoint) if not kolla_same_external_internal_vip | bool }}"
