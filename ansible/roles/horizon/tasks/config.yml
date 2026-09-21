@@ -83,8 +83,6 @@
     - horizon.enabled | bool
     - inventory_hostname in groups[horizon.group]
     - check_openrc_template.results.0.stat.exists
-  notify:
-    - Restart horizon container
 
 - name: Set custom openrc fact
   set_fact:
@@ -126,8 +124,6 @@
     - horizon.enabled | bool
     - inventory_hostname in groups[horizon.group]
     - check_clouds_yaml_template.results.0.stat.exists
-  notify:
-    - Restart horizon container
 
 - name: Set custom clouds YAML fact
   set_fact:
