@@ -39,8 +39,6 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ tunelo_services }}"
-  notify:
-    - "Restart {{ item.key }} container"
 
 - name: Copying over tunelo.conf
   vars:
@@ -60,8 +58,6 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ tunelo_services }}"
-  notify:
-    - "Restart {{ item.key }} container"
 
 - name: Copying over existing policy file
   vars:
@@ -78,5 +74,3 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ tunelo_services }}"
-  notify:
-    - "Restart {{ item.key }} container"
