@@ -1,0 +1,13 @@
+<source>
+  @type tail
+  path /var/log/kolla/manila/manila-nfs-ganesha.log
+  pos_file /var/run/fluentd/manila-nfs-ganesha.pos
+  tag infra.manila-nfs-ganesha
+  enable_watch_timer {{ fluentd_enable_watch_timer }}
+  <parse>
+    @type regexp
+    expression /^(?:(?<Timestamp>\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}) : epoch \S+ : \S+ : \S+?-(?<Pid>\d+)\[(?<thread>[^\]]*)\] (?<function>\S+) :(?<component>[^:]*?) :(?<log_level>[A-Z_]+) :)?(?<Payload>.*)$/
+    time_key Timestamp
+    time_format %d/%m/%Y %H:%M:%S
+  </parse>
+</source>
