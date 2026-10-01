@@ -146,6 +146,7 @@ cephfs_filesystem_name = {{ manila_cephfs_filesystem_name }}
 {% endif %}
 cephfs_ganesha_server_is_remote= false
 cephfs_ganesha_server_ip = {{ api_interface_address }}
+cephfs_ensure_all_shares_salt = {{ manila_cephfs_nfs_ensure_all_shares_salt }}
 {% endif %}
 {% endfor %}
 {% endif %}

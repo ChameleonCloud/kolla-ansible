@@ -177,7 +177,8 @@ manila_share_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "/run:/run{{ ':shared' if kolla_container_engine == 'docker' else '' }}"
-  - "/etc/ganesha:/etc/ganesha"
+  - "{{ 'manila_ganesha_exports:/etc/ganesha/export.d' if enable_manila_nfs_ganesha_service | bool else '' }}"
+  - "{{ 'manila_share:/var/lib/manila/' if enable_manila_backend_cephfs_nfs | bool else '' }}"
   - "kolla_logs:/var/log/kolla/"
   - "{{ '/dev/shm:/dev/shm' }}"
   - "/lib/modules:/lib/modules:ro"
@@ -209,7 +210,7 @@ manila_nfs_ganesha_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
   - "/run/:/run/:shared"
-  - "/etc/ganesha:/etc/ganesha"
+  - "manila_ganesha_exports:/etc/ganesha/export.d"
   - "kolla_logs:/var/log/kolla"
 
 manila_extra_volumes: "{{ default_extra_volumes }}"
@@ -333,6 +334,8 @@ manila_ks_users:
 # CephFS
 ####################
 manila_cephfs_filesystem_name: ""
+# Changing this makes manila-share re-export every CephFS NFS share on start.
+manila_cephfs_nfs_ensure_all_shares_salt: "kolla_ganesha_exports_volume"
 
 
 ####################
