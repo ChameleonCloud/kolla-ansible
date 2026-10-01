@@ -1,0 +1,20 @@
+---
+features:
+  - |
+    Adds ``manila_cephfs_nfs_ensure_all_shares_salt``. Changing it makes
+    ``manila_share`` recreate all CephFS NFS export files on its next
+    start. Without a redeploy, run ``openstack share service ensure
+    shares <host>@<backend>`` instead.
+fixes:
+  - |
+    NFS-Ganesha now keeps CephFS NFS exports across restarts.
+upgrade:
+  - |
+    The upgrade recreates all CephFS NFS exports, so NFS clients must
+    remount.
+  - |
+    Requires ``manila-nfs-ganesha`` and ``manila-share`` images built
+    with the ChameleonCloud kolla and Manila ``INDEX.conf`` fixes.
+  - |
+    ``/etc/ganesha`` on the host is no longer used and can be removed.
+    It contains Ceph keys.
