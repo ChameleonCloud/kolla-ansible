@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds ``manila_cephfs_nfs_ensure_all_shares_salt``. Change it to make
+    ``manila_share`` rebuild all CephFS NFS exports on its next start.
+upgrade:
+  - |
+    Ganesha export files now live in the ``manila_ganesha_exports`` volume
+    instead of ``/etc/ganesha`` on the host. The upgrade rebuilds them from
+    Manila's database, so NFS clients may need to remount.
