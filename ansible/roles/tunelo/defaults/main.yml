@@ -46,7 +46,6 @@ tunelo_api_extra_volumes: "{{ tunelo_extra_volumes }}"
 ####################
 # OpenStack
 ####################
-tunelo_admin_endpoint: "{{ admin_protocol }}://{{ tunelo_internal_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 tunelo_internal_endpoint: "{{ internal_protocol }}://{{ tunelo_internal_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 tunelo_public_endpoint: "{{ public_protocol }}://{{ tunelo_external_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 
@@ -87,7 +86,6 @@ tunelo_ks_services:
     type: "channel"
     description: "tunelo channel management service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ tunelo_admin_endpoint }}'}
       - {'interface': 'internal', 'url': '{{ tunelo_internal_endpoint }}'}
       - {'interface': 'public', 'url': '{{ tunelo_public_endpoint }}'}
 
