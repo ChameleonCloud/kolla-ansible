@@ -45,7 +45,7 @@ k3s_default_volumes:
   - "{{ node_config_directory }}/k3s/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "/etc/machine-id:/etc/machine-id:ro"
-  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
   - "k3s_server:/var/lib/rancher/k3s"
 

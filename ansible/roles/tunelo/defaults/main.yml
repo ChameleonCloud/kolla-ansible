@@ -36,7 +36,7 @@ tunelo_api_dimensions: "{{ default_container_dimensions }}"
 tunelo_api_default_volumes:
   - "{{ node_config_directory }}/tunelo-api/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
-  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
   - "{{ kolla_dev_repos_directory ~ '/tunelo/tunelo:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/tunelo' if tunelo_dev_mode | bool else '' }}"
 
