@@ -37,7 +37,7 @@ k3s_services:
 # Docker
 ####################
 k3s_tag: "{{ openstack_tag }}"
-k3s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/k3s"
+k3s_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ docker_image_name_prefix }}k3s"
 k3s_image_full: "{{ k3s_image }}:{{ k3s_tag }}"
 
 k3s_default_volumes:
