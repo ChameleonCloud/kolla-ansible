@@ -3,12 +3,9 @@ debug = {{ doni_logging_debug }}
 
 log_dir = /var/log/kolla/doni
 
-transport_url = {{ rpc_transport_url }}
-
 my_ip = {{ api_interface_address }}
 
 [oslo_messaging_notifications]
-transport_url = {{ notify_transport_url }}
 {% if doni_enabled_notification_topics %}
 driver = messagingv2
 topics = {{ doni_enabled_notification_topics | map(attribute='name') | join(',') }}
