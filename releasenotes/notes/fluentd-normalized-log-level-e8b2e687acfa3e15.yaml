@@ -1,0 +1,18 @@
+---
+features:
+  - |
+    Fluentd now adds a ``level`` field to every log record, holding a
+    normalized severity value. Services spell severities differently (e.g.
+    ``WARNING``, ``Warning``, ``warn``), which makes filtering across
+    services difficult. ``level`` maps these onto the OpenTelemetry severity
+    names ``critical``, ``error``, ``warn``, ``info``, ``debug`` and
+    ``trace``. Unrecognized values become ``unknown``, and records without a
+    ``log_level`` get a ``null`` ``level``. The original ``log_level`` field
+    is not changed.
+    `LP#1829272 <https://bugs.launchpad.net/kolla-ansible/+bug/1829272>`__
+upgrade:
+  - |
+    Fluentd now adds a ``level`` field to every log record, holding a
+    normalized severity value. The original ``log_level`` field is not
+    changed. Operators should review any custom inputs or filters that set
+    ``level``, as fluentd will now overwrite the value.
