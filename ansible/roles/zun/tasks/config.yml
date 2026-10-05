@@ -78,13 +78,13 @@
 
 - name: Copying over kubeconfig for zun k8s compute agent
   vars:
-    service: "{{ zun_services['zun-compute-k8s'] }}"
+    service_name: zun-compute-k8s
+    service: "{{ zun_services[service_name] }}"
   copy:
     src: "{{ zun_kubeconfig.results.0.stat.path }}"
     dest: "{{ node_config_directory }}/{{ service_name }}/kubeconfig.yml"
     mode: "0600"
   become: true
-  ignore_errors: true
   when:
     - zun_kubeconfig.results
     - service | service_enabled_and_mapped_to_host
