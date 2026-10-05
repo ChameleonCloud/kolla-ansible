@@ -1,0 +1,52 @@
+# Each input sets log_level from its own source, resulting in many different
+# spellings of the same severity (e.g. WARNING, Warning, warn). This filter
+# adds a `level` field mapping log_level onto the OpenTelemetry severity names:
+# `critical`, `error`, `warn`, `info`, `debug`, or `trace`, and `unknown` for
+# anything not matched. Records without log_level get level = nil.
+# log_level itself is left unchanged.
+<filter **>
+  @type record_modifier
+  # <record> is applied before <replace>. If log_level is missing, level is set
+  # to `nil` and skipped in the <replace> blocks.
+  <record>
+    level ${record["log_level"]&.to_s&.downcase}
+  </record>
+  # Order matters: a rule's output must not match any rule below it, or the
+  # value gets rewritten twice.
+  <replace>
+    key level
+    expression /^(alert|crit|critical|emer|emerg|emergency|fatal|panic)$/
+    replace critical
+  </replace>
+  <replace>
+    key level
+    expression /^(eror|err|error)$/
+    replace error
+  </replace>
+  <replace>
+    key level
+    expression /^(warn|warning)$/
+    replace warn
+  </replace>
+  <replace>
+    key level
+    expression /^(audit|info|information|informational|note|notice)$/
+    replace info
+  </replace>
+  <replace>
+    key level
+    expression /^(dbg|debug|verbose)$/
+    replace debug
+  </replace>
+  <replace>
+    key level
+    expression /^trace$/
+    replace trace
+  </replace>
+  # Catch-all: If nothing matches, set the values to `unknown`
+  <replace>
+    key level
+    expression /^(?!(critical|error|warn|info|debug|trace|unknown)$).+$/
+    replace unknown
+  </replace>
+</filter>
