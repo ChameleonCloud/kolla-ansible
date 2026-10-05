@@ -1,0 +1,51 @@
+# Logs ingested from kolla use many different spellings for the same severity,
+# e.g. WARNING, WARN, warning, Warning, or warn. To allow querying, we
+# need to rewrite them consistently. This module derives a `level` based on OTel
+# levels: critical/error/warn/info/debug/trace, or unknown if not matched.
+# The original spelling is retained in log_level.
+<filter **>
+  @type record_modifier
+  # <record> is applied before <replace>. If log_lebel is missing, level is set
+  # to `nil` and skipped in the <replace> blocks, and no label will be emitted.
+  <record>
+    level ${record["log_level"]&.to_s&.downcase}
+  </record>
+  # Order matters: a rule's output must not match any rule below it, or the
+  # value gets rewritten twice.
+  <replace>
+    key level
+    expression /^(alert|crit|critical|emer|emerg|emergency|fatal|panic)$/
+    replace critical
+  </replace>
+  <replace>
+    key level
+    expression /^(eror|err|error)$/
+    replace error
+  </replace>
+  <replace>
+    key level
+    expression /^(warn|warning)$/
+    replace warn
+  </replace>
+  <replace>
+    key level
+    expression /^(audit|info|information|informational|note|notice)$/
+    replace info
+  </replace>
+  <replace>
+    key level
+    expression /^(dbg|debug|verbose)$/
+    replace debug
+  </replace>
+  <replace>
+    key level
+    expression /^trace$/
+    replace trace
+  </replace>
+  # Catch-all: If nothing matches, set the values to `unknown`
+  <replace>
+    key level
+    expression /^(?!(critical|error|warn|info|debug|trace|unknown)$).+$/
+    replace unknown
+  </replace>
+</filter>
