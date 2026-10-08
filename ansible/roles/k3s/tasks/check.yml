@@ -1,1 +1,4 @@
 ---
+- name: Checking k3s containers
+  import_role:
+    role: service-check

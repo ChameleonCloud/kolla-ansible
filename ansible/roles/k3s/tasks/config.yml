@@ -47,7 +47,6 @@
 - name: Templating k3s_config.yaml
   vars:
     service_name: "{{ item.key }}"
-    k3s_node_config: "{{ k3s_config }}"
   template:
     src: "k3s_config.yaml.j2"
     dest: "{{ node_config_directory }}/{{ item.key }}/k3s_config.yaml"

@@ -23,5 +23,5 @@
     timeout: 1
     state: stopped
   when:
-    - container_facts['doni_api'] is not defined
+    - container_facts.containers['doni_api'] is not defined
     - inventory_hostname in groups['doni-api']

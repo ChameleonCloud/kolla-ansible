@@ -208,7 +208,7 @@ manila_data_default_volumes:
 manila_nfs_ganesha_default_volumes:
   - "{{ node_config_directory }}/manila-nfs-ganesha/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
-  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "/run/:/run/:shared"
   - "manila_ganesha_exports:/etc/ganesha/export.d"
   - "kolla_logs:/var/log/kolla"

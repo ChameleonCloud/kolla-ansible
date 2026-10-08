@@ -36,9 +36,9 @@ tunelo_api_dimensions: "{{ default_container_dimensions }}"
 tunelo_api_default_volumes:
   - "{{ node_config_directory }}/tunelo-api/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
-  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_os_family == 'Debian' else '' }}"
+  - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
-  - "{{ kolla_dev_repos_directory ~ '/tunelo/tunelo:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/tunelo' if tunelo_dev_mode | bool else '' }}"
+  - "{{ kolla_dev_repos_directory ~ '/tunelo:/dev-mode/tunelo' if tunelo_dev_mode | bool else '' }}"
 
 tunelo_extra_volumes: "{{ default_extra_volumes }}"
 tunelo_api_extra_volumes: "{{ tunelo_extra_volumes }}"
@@ -46,7 +46,6 @@ tunelo_api_extra_volumes: "{{ tunelo_extra_volumes }}"
 ####################
 # OpenStack
 ####################
-tunelo_admin_endpoint: "{{ admin_protocol }}://{{ tunelo_internal_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 tunelo_internal_endpoint: "{{ internal_protocol }}://{{ tunelo_internal_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 tunelo_public_endpoint: "{{ public_protocol }}://{{ tunelo_external_fqdn | put_address_in_context('url') }}:{{ tunelo_api_port }}"
 
@@ -87,7 +86,6 @@ tunelo_ks_services:
     type: "channel"
     description: "tunelo channel management service"
     endpoints:
-      - {'interface': 'admin', 'url': '{{ tunelo_admin_endpoint }}'}
       - {'interface': 'internal', 'url': '{{ tunelo_internal_endpoint }}'}
       - {'interface': 'public', 'url': '{{ tunelo_public_endpoint }}'}
 

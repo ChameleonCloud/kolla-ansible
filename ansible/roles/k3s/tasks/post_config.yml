@@ -119,14 +119,17 @@
           type: Available
           status: "True"
         wait_timeout: 300
-    - name: Wait for GlobalNetworkPolicy CRD to be registered
+    # The policies use projectcalico.org/v3, which kube-apiserver only serves
+    # once the calico API server's APIService is Available.
+    - name: Wait for the Calico v3 API to be served
       kubernetes.core.k8s_info:
-        kind: CustomResourceDefinition
-        name: globalnetworkpolicies.crd.projectcalico.org
+        api_version: apiregistration.k8s.io/v1
+        kind: APIService
+        name: v3.projectcalico.org
         kubeconfig: "{{ node_custom_config }}/kubeconfig.yml"
         wait: yes
         wait_condition:
-          type: Established
+          type: Available
           status: "True"
         wait_timeout: 300
     - name: applying calico global network policies
