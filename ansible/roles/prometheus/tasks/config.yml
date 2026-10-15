@@ -29,7 +29,7 @@
   delegate_to: localhost
   register: prometheus_alert_rules
   when:
-    - enable_prometheus_alertmanager | bool
+    - prometheus_load_alert_rules | bool
 
 - name: Copying over custom prometheus alert rules files
   become: true
@@ -41,7 +41,7 @@
     mode: "0660"
   when:
     - service | service_enabled_and_mapped_to_host
-    - enable_prometheus_alertmanager | bool
+    - prometheus_load_alert_rules | bool
     - prometheus_alert_rules is defined and prometheus_alert_rules.files | length > 0
   with_items: "{{ prometheus_alert_rules.files }}"
 
