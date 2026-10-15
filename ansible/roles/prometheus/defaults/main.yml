@@ -156,6 +156,7 @@ prometheus_services:
 ####################
 prometheus_external_labels:
 #  <labelname>: <labelvalue>
+prometheus_load_alert_rules: "{{ enable_prometheus_alertmanager | bool }}"
 
 ####################
 # Server

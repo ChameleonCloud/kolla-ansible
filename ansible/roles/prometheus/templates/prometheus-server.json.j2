@@ -19,7 +19,7 @@
             "preserve_properties": true,
             "optional": true
         }
-        {% if enable_prometheus_alertmanager | bool %},
+        {% if prometheus_load_alert_rules | bool %},
         {
             "source": "{{ container_config_directory }}/*.rules.yml",
             "dest": "/etc/prometheus/",
