@@ -53,6 +53,19 @@ fluentd_opensearch_ssl_verify: "true"
 fluentd_opensearch_cacert: "{{ openstack_cacert }}"
 fluentd_opensearch_request_timeout: "60s"
 
+# Ship logs to an external Loki instance
+external_loki_enabled: false
+loki_url: ""
+loki_username: ""
+loki_password: ""
+# Static labels attached to every Loki stream.
+loki_extra_labels:
+  openstack_release: "{{ openstack_release }}"
+  kolla_external_fqdn: "{{ kolla_external_fqdn }}"
+  openstack_region_name: "{{ openstack_region_name }}"
+# Deployment-specific labels, extends and overrides loki_extra_labels.
+loki_custom_labels: {}
+
 ####################
 # Docker
 ####################
