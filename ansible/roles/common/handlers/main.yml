@@ -12,6 +12,7 @@
     volumes: "{{ service.volumes }}"
     environment: "{{ service.environment }}"
     dimensions: "{{ service.dimensions }}"
+    group_add: "{{ service.group_add }}"
 
 - name: Restart kolla-toolbox container
   vars:
