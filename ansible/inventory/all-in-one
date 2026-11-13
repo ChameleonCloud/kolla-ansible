@@ -142,6 +142,9 @@ control
 [bifrost:children]
 deployment
 
+[zun:children]
+control
+
 [skyline:children]
 control
 
@@ -487,6 +490,19 @@ designate
 # Placement
 [placement-api:children]
 placement
+
+# Zun
+[zun-api:children]
+zun
+
+[zun-wsproxy:children]
+zun
+
+[zun-compute:children]
+compute
+
+[zun-cni-daemon:children]
+compute
 
 # Skyline
 [skyline-apiserver:children]

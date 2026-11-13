@@ -1,0 +1,3 @@
+---
+- name: Deploy zun
+  ansible.builtin.import_tasks: deploy.yml

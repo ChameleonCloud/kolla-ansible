@@ -21,3 +21,4 @@ OVN;–;✅;✅;✅;✅;–;✅;✅;–;✅;–;–;Neutron ML2/OVN + OVN Octavi
 Prometheus + OpenSearch;–;–;–;✅;–;✅;✅;–;–;–;–;–;Fluentd, OpenSearch, Grafana, Prometheus, RabbitMQ/DB core.
 Skyline;❌;–;✅;–;–;✅;–;–;–;–;–;–;"Skyline dashboard; currently disabled (SSO issues)."
 Telemetry;–;–;✅;–;–;✅;–;–;–;–;✅;✅;Aodh, Ceilometer, Gnocchi.
+Zun;–;✅;✅;–;✅;✅;✅;✅;–;–;–;–;"Zun + Kuryr + Cinder LVM; etcd; dashboard."
