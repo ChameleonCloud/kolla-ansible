@@ -86,6 +86,7 @@
     - "pxelinux.default.j2"
   when:
     # Only required when Ironic dnsmasq is in use.
+    - enable_ironic_dnsmasq | bool
     - groups['ironic-dnsmasq'] | length > 0
     - service | service_enabled_and_mapped_to_host
     - not ironic_dnsmasq_serve_ipxe | bool
@@ -103,6 +104,7 @@
     - "ironic-agent.initramfs"
   when:
     # Only required when Ironic dnsmasq is in use.
+    - enable_ironic_dnsmasq | bool
     - groups['ironic-dnsmasq'] | length > 0
     - service | service_enabled_and_mapped_to_host
     - not ironic_dnsmasq_serve_ipxe | bool
@@ -120,6 +122,7 @@
     - "ironic-agent.initramfs"
   when:
     # Only required when Ironic dnsmasq is in use.
+    - enable_ironic_dnsmasq | bool
     - groups['ironic-dnsmasq'] | length > 0
     - service | service_enabled_and_mapped_to_host
 
@@ -137,6 +140,7 @@
     - "ipa.ipxe.j2"
   when:
     # Only required when Ironic dnsmasq is in use.
+    - enable_ironic_dnsmasq | bool
     - groups['ironic-dnsmasq'] | length > 0
     - service | service_enabled_and_mapped_to_host
 

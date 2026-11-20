@@ -61,6 +61,7 @@
   failed_when: not result.stat.exists
   when:
     # Only required when Ironic dnsmasq is in use.
+    - enable_ironic_dnsmasq | bool
     - groups['ironic-dnsmasq'] | length > 0
     - (not ironic_dnsmasq_serve_ipxe | bool and inventory_hostname in groups['ironic-tftp']) or
         (ironic_dnsmasq_serve_ipxe | bool and inventory_hostname in groups['ironic-http'])
