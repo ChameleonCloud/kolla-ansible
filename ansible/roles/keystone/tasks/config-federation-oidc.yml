@@ -38,7 +38,9 @@
   delegate_to: localhost
   run_once: true
   loop: "{{ keystone_identity_providers }}"
-  when: item.protocol == 'openid'
+  when:
+    - item.protocol == 'openid'
+    - item.metadata_folder is defined
 
 - name: Template OpenID Identity Providers metadata
   vars:

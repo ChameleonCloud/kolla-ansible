@@ -60,3 +60,23 @@
       120, 240, 480, 720, 1440, 3600, 7200, 10800, 14400, 21600, 43200, 60480,
       120960, 151200, 201600, 302400, 604800. These values ensure an evenly-spaced
       run schedule as they divide 7 days without remainder.
+
+- name: Checking OpenID Connect providers configured with a metadata URL
+  run_once: true
+  vars:
+    keystone_openid_providers: "{{ keystone_identity_providers | selectattr('protocol', 'equalto', 'openid') | list }}"
+  ansible.builtin.assert:
+    that:
+      - keystone_openid_providers | length == 1
+      - keystone_identity_providers_openid_metadata_url[0].metadata_folder is not defined
+      - keystone_identity_providers_openid_metadata_url[0].client_id | default('') | length > 0
+      - keystone_identity_providers_openid_metadata_url[0].client_secret | default('') | length > 0
+    msg: >-
+      An OpenID Connect identity provider with metadata_url must be the only
+      openid provider in keystone_identity_providers, because mod_auth_openidc
+      supports a single provider configured this way. It must set client_id
+      and client_secret, and must not also set metadata_folder. Use
+      metadata_folder instead to configure multiple providers.
+  when:
+    - keystone_enable_federation_openid | bool
+    - keystone_identity_providers_openid_metadata_url | length > 0

@@ -295,6 +295,11 @@ keystone_enable_federation_openid: >-
     enable_keystone_federation | bool and
     keystone_identity_providers | selectattr('protocol', 'equalto', 'openid') | list | count > 0
   }}
+keystone_identity_providers_openid_metadata_url: >-
+  {{
+    keystone_identity_providers | selectattr('protocol', 'equalto', 'openid') |
+    selectattr('metadata_url', 'defined') | list
+  }}
 keystone_should_remove_attribute_mappings: false
 keystone_should_remove_identity_providers: false
 keystone_federation_oidc_response_type: "id_token"
