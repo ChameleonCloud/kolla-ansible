@@ -27,5 +27,3 @@
     - inventory_hostname in groups[item.value.group]
     - item.value.enabled | bool
   with_dict: "{{ prometheus_services }}"
-  notify:
-    - Restart {{ item.key }} container
