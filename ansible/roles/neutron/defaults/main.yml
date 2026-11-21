@@ -662,7 +662,7 @@ neutron_server_default_volumes:
   - "{{ '/dev/shm:/dev/shm' }}"
   - "{{ kolla_dev_repos_directory ~ '/neutron:/dev-mode/neutron' if neutron_dev_mode | bool else '' }}"
 neutron_server_plugin_volumes_raw: "{% for plugin in neutron_dev_plugins %}{{ kolla_dev_repos_directory ~ '/neutron-plugins/' ~ plugin.name ~ ':/dev-mode/' ~ plugin.name if neutron_dev_mode | bool else '' }},{% endfor %}"
-neutron_server_plugin_volumes: "{{ neutron_server_plugin_volumes_raw.split(',') }}"
+neutron_server_plugin_volumes: "{{ (neutron_server_plugin_volumes_raw or '').split(',') }}"
 neutron_bgp_dragent_default_volumes:
   - "{{ node_config_directory }}/neutron-bgp-dragent/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
