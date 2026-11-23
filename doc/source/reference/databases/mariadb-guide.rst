@@ -62,6 +62,36 @@ Kolla currently supports balancing only for default shard. This will be
 changed in future by replacement of HAProxy with ProxySQL. This results in
 certain limitations as described below.
 
+ProxySQL users
+--------------
+
+When ProxySQL is enabled, it only accepts connections from database users
+listed in its configuration. Kolla Ansible registers the users of the
+services it deploys. Users of other projects, for example tools that connect
+to the database, can be registered with ``proxysql_extra_projects`` in
+``/etc/kolla/globals.yml``. It is keyed by project name, and each value uses
+the same format as the ``<project>_database_shard`` variables of Kolla Ansible
+services:
+
+.. code-block:: yaml
+
+   proxysql_extra_projects:
+     reporting:
+       users:
+         - user: "reporting"
+           password: "{{ reporting_database_password }}"
+           shard_id: "{{ mariadb_default_database_shard_id }}"
+
+The ``reporting_database_password`` variable used in this example must be
+added to ``/etc/kolla/passwords.yml``. ``shard_id`` selects the MariaDB shard
+that the user's queries are routed to.
+
+The users are applied by the ``loadbalancer`` role during
+``kolla-ansible deploy``, ``reconfigure``, ``upgrade`` and ``genconfig``, and
+ProxySQL is restarted if they change. Removing a project does not
+remove its file from ``/etc/kolla/proxysql/users/`` on the hosts; this must
+be done manually. The users themselves must still be created in MariaDB.
+
 Backup and restore
 ------------------
 
