@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    ProxySQL can now accept database users of projects that Kolla Ansible
+    doesn't deploy. List them in ``proxysql_extra_projects``, for example:
+
+    .. code-block:: yaml
+
+       proxysql_extra_projects:
+         reporting:
+           users:
+             - user: "reporting"
+               password: "{{ reporting_database_password }}"
+               shard_id: "{{ mariadb_default_database_shard_id }}"
+
+    The users still need to be created in MariaDB.
+    `LP#2110528 <https://bugs.launchpad.net/kolla-ansible/+bug/2110528>`__

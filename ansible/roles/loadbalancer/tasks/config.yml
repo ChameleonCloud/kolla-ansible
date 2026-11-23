@@ -128,6 +128,18 @@
     - "{{ node_custom_config }}/proxysql/proxysql.yaml"
     - "proxysql/proxysql.yaml.j2"
 
+- name: Copying over ProxySQL config for extra projects
+  vars:
+    service: "{{ loadbalancer_services['proxysql'] }}"
+    proxysql_project: "extra-{{ item.key }}"
+    proxysql_project_database_shard: "{{ item.value }}"
+  ansible.builtin.include_role:
+    name: proxysql-config
+  loop: "{{ proxysql_extra_projects | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: service | service_enabled_and_mapped_to_host
+
 - name: Copying over haproxy single external frontend config
   vars:
     service: "{{ loadbalancer_services['haproxy'] }}"
