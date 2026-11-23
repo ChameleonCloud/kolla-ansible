@@ -1,6 +1,7 @@
 [DEFAULT]
 debug = {{ blazar_logging_debug }}
 log_dir = /var/log/kolla/blazar
+log_file = $log_dir/{{ service_name }}.log
 transport_url = {{ rpc_transport_url }}
 host = {{ api_interface_address }}
 port = {{ blazar_api_port }}
