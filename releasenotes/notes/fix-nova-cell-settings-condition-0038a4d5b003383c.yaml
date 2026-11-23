@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes the ``nova-cell`` and ``nova`` roles never updating existing cell
+    and cell0 mappings, so changes to their message queue or database URLs,
+    for example after a password rotation, were not applied. The cell
+    creation task also no longer runs for an existing cell.
+    `LP#2174666 <https://bugs.launchpad.net/kolla-ansible/+bug/2174666>`__

@@ -77,7 +77,7 @@
       failed_when:
         - nova_cell0_updated.rc != 0
       when:
-        - nova_cell_settings | bool
+        - nova_cell_settings is truthy
         - nova_cell_settings.cell_database != nova_cell0_connection
 
 - name: Include tasks from bootstrap_service.yml
